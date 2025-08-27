@@ -173,12 +173,11 @@ void AddIndicatorLight(CAR_DATA *cp, int Type)
 	life2 = &cp->ap.life2;
 
 	if (cp->ap.life < 0)
-		brightness = (0xff - (u_int)cp->ap.life) * 2;
+		brightness = (255 - (u_int)cp->ap.life) * 2 & 255;
 	else
-		brightness = cp->ap.life << 1;
+		brightness = cp->ap.life << 1 & 255;
 
-	col.r = brightness & 0xFF;
-
+	col.r = brightness;
 	col.g = 0;
 	col.b = 0;
 
