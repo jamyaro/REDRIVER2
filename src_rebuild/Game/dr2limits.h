@@ -67,6 +67,7 @@
 // debris limits
 #define MAX_SMOKE				80
 #define MAX_LEAVES				50
+#define MAX_BIRDS				7
 #define MAX_DEBRIS				60
 #define MAX_GROUND_DEBRIS		16
 #define MAX_DAMAGED_LAMPS		5

@@ -88,6 +88,14 @@ struct LEAF
 	char sin_addition2;
 };
 
+struct BIRD
+{
+	VECTOR_NOPAD position;
+	SVECTOR_NOPAD direction;
+	short life;
+	short step;
+};
+
 struct TRI_POINT
 {
 	BVECTOR v0;
@@ -388,6 +396,9 @@ LEAF leaf[MAX_LEAVES];
 
 SVECTOR debris_rotvec;
 DEBRIS debris[MAX_DEBRIS];
+
+BIRD birds[MAX_BIRDS];
+int gNumBirds = 0;
 
 int StreakCount1 = 0;
 int main_cop_light_pos = 0;
@@ -756,6 +767,174 @@ void AddLeaf(VECTOR *Position, int num_leaves, int Type)
 }
 
 // [D] [T]
+void CreateBirds(VECTOR* pos, int count)
+{
+	BIRD *bird;
+	int i;
+
+	if (bird_texture1.tpageid == 0 || bird_texture2.tpageid == 0)
+	{
+		return;
+	}
+
+	if (count >= MAX_BIRDS)
+		count = MAX_BIRDS-1;
+
+	if (birds[0].life != 0)
+	{
+		return;
+	}
+
+	gNumBirds = count;
+	for (i = 0; i < count; ++i)
+	{
+		bird = &birds[i];
+		bird->position.vx = pos->vx - 32 + (rand() & 63);
+		bird->position.vy = pos->vy - 32 + (rand() & 63);
+		bird->position.vz = pos->vz - 32 + (rand() & 63);
+		bird->direction.vx = (rand() & 63) - 32;
+		bird->direction.vy = -10 - (rand() & 16);
+		bird->direction.vz = (rand() & 63) - 32;
+		bird->life = 120;
+		bird->step = rand() & 7;
+	}
+}
+
+// [D] [T]
+void HandleBirds()
+{
+	BIRD* bird;
+	POLY_FT4* primptr;
+	VECTOR pos;
+	SVECTOR vertPos[4];
+	u_short clutid;
+	short sizeX;
+	short sizeY;
+	int i;
+	int z;
+	int bright;
+
+	if (birds[0].life == 0 || gNumBirds == 0)
+	{
+		return;
+	}
+
+	gte_SetRotMatrix(&identity);
+
+	bright = 128;
+	if (gNight != 0)
+		bright = 64;
+
+	for(i = 0; i < gNumBirds; ++i)
+	{
+		bird = &birds[i];
+		if (bird->life <= 0)
+		{
+			continue;
+		}
+
+		pos.vx = bird->position.vx - camera_position.vx;
+		pos.vy = bird->position.vy - camera_position.vy;
+		pos.vz = bird->position.vz - camera_position.vz;
+		Apply_Inv_CameraMatrix(&pos);
+
+		gte_SetTransVector(&pos);
+
+		if (pauseflag == 0 && pos.vz > 13500)
+		{
+			bird->life = 0;
+			return;
+		}
+
+		sizeX = 40;
+		if (bird->step < 4)
+		{
+			sizeY = 19;
+		}
+		else
+		{
+			sizeX = 64;
+			sizeY = 24;
+		}
+		vertPos[0].vy = -sizeY;
+		vertPos[1].vy = -sizeY;
+		vertPos[0].vx = -sizeX;
+		vertPos[0].vz = 0;
+		vertPos[1].vx = sizeX;
+		vertPos[1].vz = 0;
+		vertPos[2].vx = -sizeX;
+		vertPos[2].vy = sizeY;
+		vertPos[2].vz = 0;
+		vertPos[3].vx = sizeX;
+		vertPos[3].vy = sizeY;
+		vertPos[3].vz = 0;
+
+		gte_ldv3(&vertPos[0], &vertPos[1], &vertPos[2]);
+		gte_rtpt();
+
+		primptr = (POLY_FT4*)current->primptr;
+		if (bird->step < 4)
+		{
+			primptr->u0 = bird_texture2.coords.u0;
+			primptr->v0 = bird_texture2.coords.v0;
+			primptr->u1 = bird_texture2.coords.u1;
+			primptr->v1 = bird_texture2.coords.v1;
+			primptr->u2 = bird_texture2.coords.u2;
+			primptr->v2 = bird_texture2.coords.v2;
+			primptr->u3 = bird_texture2.coords.u3;
+			primptr->v3 = bird_texture2.coords.v3;
+			primptr->tpage = bird_texture2.tpageid;
+			clutid = bird_texture2.clutid;
+		}
+		else
+		{
+			primptr->u0 = bird_texture1.coords.u0;
+			primptr->v0 = bird_texture1.coords.v0;
+			primptr->u1 = bird_texture1.coords.u1;
+			primptr->v1 = bird_texture1.coords.v1;
+			primptr->u2 = bird_texture1.coords.u2;
+			primptr->v2 = bird_texture1.coords.v2;
+			primptr->u3 = bird_texture1.coords.u3;
+			primptr->v3 = bird_texture1.coords.v3;
+			primptr->tpage = bird_texture1.tpageid;
+			clutid = bird_texture1.clutid;
+		}
+
+		primptr->clut = clutid;
+		setPolyFT4(primptr);
+		primptr->r0 = bright;
+		primptr->g0 = bright;
+		primptr->b0 = bright;
+
+		gte_stsz(&z);
+		if (z < 150)
+			continue;
+
+		gte_stsxy3(&primptr->x0, &primptr->x1, &primptr->x2);
+
+		gte_ldv0(&vertPos[3]);
+		gte_rtps();
+
+		gte_stsxy(&primptr->x3);
+
+		addPrim(current->ot + (z >> 3), primptr);
+		
+		current->primptr += sizeof(POLY_FT4);
+
+		if (pauseflag == 0)
+		{
+			bird->position.vx += bird->direction.vx;
+			bird->position.vy += bird->direction.vy;
+			bird->position.vz = bird->position.vz + bird->direction.vz;
+
+			if (--bird->step == -1)
+				bird->step = 8;
+			--bird->life;
+		}
+	}
+}
+
+// [D] [T]
 void SwirlLeaves(CAR_DATA *cp)
 {
 	int XDiff;
@@ -801,8 +980,8 @@ void InitDebrisNames(void)
 	GetTextureDetails("SKID", &gTyreTexture);
 	GetTextureDetails("FLARE", &flare_texture);
 	GetTextureDetails("SPLASH", &sea_texture);
-	GetTextureDetails("SWBIRD1", &bird_texture1);
-	GetTextureDetails("SWBIRD2", &bird_texture2);
+	GetTextureDetails("SWBIRD1", &bird_texture1, 0);
+	GetTextureDetails("SWBIRD2", &bird_texture2, 0);
 	GetTextureDetails("LENSFLR", &lensflare_texture);
 	GetTextureDetails("SKYSUN", &sun_texture);
 	GetTextureDetails("SKYMOON", &moon_texture);
@@ -932,6 +1111,8 @@ void InitDebris(void)
 			debris_rot_table[j][i].v2.vz = temptri.v2.vz;
 		}
 	}
+
+	birds[0].life = 0;
 
 	for (i = 0; i < MAX_SMOKE; i++)
 	{
@@ -3135,7 +3316,7 @@ void HandleDebris(void)
 	GetSmokeDrift(&Drift);
 
 	MoveHubcap();
-
+	HandleBirds();
 	SetRotMatrix(&inv_camera_matrix);
 
 	gte_SetTransVector(&dummy);
@@ -3530,7 +3711,7 @@ void DrawRainDrops(void)
 		bright = 50;
 
 	if (gNight != 0)
-		bright -= -15;
+		bright -= 15;
 
 	col = bright >> 1 | (bright >> 1) << 8;
 	col |= col | col << 0x10;

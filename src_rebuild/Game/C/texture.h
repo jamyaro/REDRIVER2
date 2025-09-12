@@ -40,7 +40,7 @@ extern int LoadTPageAndCluts(RECT16 *tpage, RECT16 *cluts, int tpage2send, char 
 extern int Find_TexID(MODEL *model, int t_id); // 0x000805EC
 extern TEXINF* GetTEXINFName(char *name, int *tpagenum, int *texturenum); // 0x00080F3C
 extern TEXINF* GetTextureInfoName(char *name, TPAN *result); // 0x00080DA0
-extern void GetTextureDetails(char *name, TEXTURE_DETAILS *info); // 0x00080BB0
+extern void GetTextureDetails(char *name, TEXTURE_DETAILS *info, int defaultToSea = 1); // 0x00080BB0
 
 extern void update_slotinfo(int tpage, int slot, RECT16 *pos); // 0x00081038
 

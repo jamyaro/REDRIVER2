@@ -599,7 +599,7 @@ void ReloadIcons(void)
 }
 
 // [D] [T]
-void GetTextureDetails(char *name, TEXTURE_DETAILS *info)
+void GetTextureDetails(char *name, TEXTURE_DETAILS *info, int defaultToSea)
 {
 	int i, j;
 	int texamt;
@@ -632,7 +632,12 @@ void GetTextureDetails(char *name, TEXTURE_DETAILS *info)
 		}
 	}
 
-	GetTextureDetails("SEA", info);	// weird but ok, ok...
+	info->tpageid = 0;
+	info->clutid = 0;
+	info->texture_number = 0;
+	info->texture_page = 0;
+	if (defaultToSea)
+		GetTextureDetails("SEA", info);	// weird but ok, ok...
 }
 
 
