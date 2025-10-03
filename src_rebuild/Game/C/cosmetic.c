@@ -22,7 +22,7 @@ CAR_COSMETICS car_cosmetics[MAX_CAR_RESIDENT_MODELS];
 #if ENABLE_GAME_FIXES
 // [A] storage for spooled models
 // remember: we already have more than 1k of free memory with optimizations
-CAR_COSMETICS levelSpecCosmetics[5];
+CAR_COSMETICS levelSpecCosmetics[MAX_CAR_RESIDENT_MODELS];
 #endif
 
 #if USE_PC_FILESYSTEM
