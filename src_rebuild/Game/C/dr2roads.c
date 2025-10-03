@@ -346,9 +346,6 @@ sdPlane* sdGetCell(VECTOR *pos)
 	buffer = RoadMapDataRegions[(cellPos.x >> 16 & 1) ^ (regions_across / 2 & 1) + 
 								(cellPos.y >> 15 & 2) ^ (regions_down & 2)];
 
-	// Alpha 1.6 code, works too; not widely tested yet
-	//buffer = *(short**)((int)RoadMapDataRegions + (cellPos.x >> 14 & 4 ^ cellPos.y >> 13 & 8 ^ sdSelfModifyingCode));
-
 	plane = GetSeaPlane();
 	
 	if (*buffer != 2)
