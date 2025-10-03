@@ -3645,7 +3645,7 @@ VECTOR* TriggerEvent(int i)
 					break;
 				case 8:
 					// open gate to secret car
-					PingOutAllSpecialCivCars();
+					PrepareSecretCar();
 				
 					TriggerDoor(&rioDoor[4], &stage[i], 0);
 					TriggerDoor(&rioDoor[5], &stage[i], 0);
