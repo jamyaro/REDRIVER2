@@ -2162,7 +2162,7 @@ void CheckSpecialSpool(void)
 		specialState == SpecSpool_None &&
 		GameType != GAME_PURSUIT &&
 		LoadedArea != -1 &&
-		SpecialByRegion[GameLevel][LoadedArea] != MissionHeader->residentModels[4]-7) 
+		SpecialByRegion[GameLevel][LoadedArea] != MissionHeader->residentModels[4] - 7) 
 	{
 		lcp = car_data;
 
@@ -2184,7 +2184,7 @@ void CheckSpecialSpool(void)
 		gCarLowModelPtr[4] = NULL;
 
 		specSpoolModelIndex = SpecialByRegion[GameLevel][LoadedArea];
-		MissionHeader->residentModels[4] = SpecialByRegion[GameLevel][LoadedArea] + 7;
+		MissionHeader->residentModels[4] = specSpoolModelIndex + 7;
 
 		SpecialStartNextBlock();
 	}
@@ -2201,7 +2201,7 @@ void QuickSpoolSpecial(void)
 	gCarDamModelPtr[4] = NULL;
 	gCarLowModelPtr[4] = NULL;
 
-	specSpoolModelIndex = MissionHeader->residentModels[4]-7;
+	specSpoolModelIndex = MissionHeader->residentModels[4] - 7;
 
 	do {
 		SpoolSYNC();
@@ -2214,6 +2214,12 @@ void QuickSpoolSpecial(void)
 // [D] [T]
 void PrepareSecretCar(void)
 {
+	// [A] Don't do anything if model is already spooled
+	if (MissionHeader->residentModels[4] == 12)
+	{
+		return;
+	}
+
 	allowSpecSpooling = 0;
 	PingOutAllSpecialCivCars();
 
@@ -2222,9 +2228,10 @@ void PrepareSecretCar(void)
 	gCarLowModelPtr[4] = NULL;
 
 	specSpoolModelIndex = 5;
+	MissionHeader->residentModels[4] = 12;
+
 	specModelValid = 0;
 	startSpecSpool = CameraCnt;
-	MissionHeader->residentModels[4] = 12;
 	specialState = SpecSpool_None;
 	specBlocksToLoad = 0;
 	SpecialStartNextBlock();
