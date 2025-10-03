@@ -2222,7 +2222,7 @@ int PingInCivCar(int minPingInDist)
 
 	// force spawn limo nearby in Caine's Cash
 	if (minPingInDist == 666)
-		model = 4;
+		model = MAX_CAR_RESIDENT_MODELS - 1;
 
 	// select car color palette
 	if (missionResidentCarModels[model] == 0 || missionResidentCarModels[model] > 4)
