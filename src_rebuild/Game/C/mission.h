@@ -14,6 +14,7 @@ extern GAMEMODE CurrentGameMode;
 extern GAMEMODE WantedGameMode;
 extern int gCurrentMissionNumber;
 extern MS_MISSION*MissionHeader;
+extern int missionResidentCarModels[MAX_CAR_RESIDENT_MODELS];
 extern STREAM_SOURCE* PlayerStartInfo[8];
 extern int numPlayersToCreate;
 extern int gStartOnFoot;

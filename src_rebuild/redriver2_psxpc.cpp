@@ -246,7 +246,7 @@ void GameDebugKeys(int nKey, char down)
 		if (ShiftModifier)
 		{
 			// force a special car
-			model = MissionHeader->residentModels[4];
+			model = missionResidentCarModels[MAX_CAR_RESIDENT_MODELS - 1];
 			palette = 0;
 			lastmodel = model;
 		}
@@ -255,7 +255,7 @@ void GameDebugKeys(int nKey, char down)
 			for (int i = 0; i < 5; i++)
 			{
 				// horrible randomness
-				int newmodel = MissionHeader->residentModels[i];
+				int newmodel = missionResidentCarModels[i];
 
 				if (newmodel == 0 || newmodel == lastmodel)
 					continue;
@@ -267,7 +267,7 @@ void GameDebugKeys(int nKey, char down)
 					if (tmp & 4)
 					{
 						// rare chance of spawning special car
-						model = MissionHeader->residentModels[4];
+						model = missionResidentCarModels[MAX_CAR_RESIDENT_MODELS - 1];
 						palette = 0;
 						lastmodel = model;
 						break;

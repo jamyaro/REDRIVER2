@@ -609,7 +609,7 @@ int TriggerInGameCutsceneSystem(int cutscene)
 							if (gCutsceneAtEnd != 0 && player[0].playerType == 1)
 							{
 								stream->SourceType.palette = car_data[player[0].playerCarId].ap.palette;
-								stream->SourceType.model = MissionHeader->residentModels[car_data[player[0].playerCarId].ap.model];
+								stream->SourceType.model = missionResidentCarModels[car_data[player[0].playerCarId].ap.model];
 
 								bDamageOverride = 1;
 								gCutsceneAtEnd = 0;

@@ -13,12 +13,12 @@ extern CAR_DATA car_data[MAX_CARS + 2];	// all cars + Tanner cbox + Camera cbox
 extern CAR_DATA* active_car_list[MAX_CARS];
 extern unsigned char lightsOnDelay[MAX_CARS];
 
-extern CAR_MODEL NewCarModel[MAX_CAR_MODELS];
-extern CAR_MODEL NewLowCarModel[MAX_CAR_MODELS];
+extern CAR_MODEL NewCarModel[MAX_CAR_RESIDENT_MODELS];
+extern CAR_MODEL NewLowCarModel[MAX_CAR_RESIDENT_MODELS];
 
-extern MODEL* gCarLowModelPtr[MAX_CAR_MODELS];
-extern MODEL* gCarDamModelPtr[MAX_CAR_MODELS];
-extern MODEL* gCarCleanModelPtr[MAX_CAR_MODELS];
+extern MODEL* gCarLowModelPtr[MAX_CAR_RESIDENT_MODELS];
+extern MODEL* gCarDamModelPtr[MAX_CAR_RESIDENT_MODELS];
+extern MODEL* gCarCleanModelPtr[MAX_CAR_RESIDENT_MODELS];
 
 extern int whichCP;		// car poly counter
 extern int baseSpecCP;	// special car poly counter

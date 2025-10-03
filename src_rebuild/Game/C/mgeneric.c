@@ -24,7 +24,7 @@ void StorePlayerPosition(SAVED_PLAYER_POS *data)
 
 		cp = &car_data[slot];
 
-		data->type = ((MissionHeader->residentModels[cp->ap.model] & 0xfff) << 4) | 1 | cp->ap.palette << 8;
+		data->type = ((missionResidentCarModels[cp->ap.model] & 0xfff) << 4) | 1 | cp->ap.palette << 8;
 
 		data->totaldamage = cp->totalDamage;
 		data->felony = cp->felonyRating;
@@ -113,7 +113,7 @@ void StoreCarPosition(MS_TARGET *target, SAVED_CAR_POS *data)
 
 	cp = &car_data[slot];
 
-	data->model = MissionHeader->residentModels[cp->ap.model];
+	data->model = missionResidentCarModels[cp->ap.model];
 
 	data->palette = cp->ap.palette;
 	data->totaldamage = cp->totalDamage;

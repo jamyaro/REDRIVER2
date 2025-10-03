@@ -1457,7 +1457,7 @@ void SetUpEvents(int full)
 			firstMissionEvent = &event[cEvents];
 			cEvents += 3;
 		}
-		else if (gCurrentMissionNumber - 39U < 2)
+		else if (gCurrentMissionNumber == 40)
 		{
 			// setup Lenny helicopter
 			evt[cEvents].flags = 0xC0;

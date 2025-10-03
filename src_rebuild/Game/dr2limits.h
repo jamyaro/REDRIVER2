@@ -19,7 +19,12 @@
 #define MAX_MODEL_SLOTS			1536		// DO NOT CHANGE. No effect in upping it - limited by cell types
 #define MAX_CARS				20
 
-#define MAX_CAR_MODELS			5
+#ifndef PSX
+#define MAX_CAR_RESIDENT_MODELS	6			// use all permanently loaded car models available
+#else
+#define MAX_CAR_RESIDENT_MODELS	5
+#endif
+
 #define MAX_PEDESTRIANS			28
 #define MAX_SEATED_PEDS			20
 #define MAX_PLACED_PEDS			15

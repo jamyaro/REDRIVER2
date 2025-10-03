@@ -1754,14 +1754,14 @@ void CleanModelSpooled(void)
 	if (specBlocksToLoad == lastCleanBlock-1) 
 	{
 		loadaddr = (int *)(specLoadBuffer + 12);
-		gCarCleanModelPtr[4] = (MODEL *)modelMemory;
+		gCarCleanModelPtr[MAX_CAR_RESIDENT_MODELS-1] = (MODEL *)modelMemory;
 	}
 
 	// memcpy
 	while (loadaddr < (int*)(specLoadBuffer + CDSECTOR_SIZE))
 		*modelMemory++ = *loadaddr++;
 
-	polyBlock = GET_RELOC_MODEL_DATA(int, gCarCleanModelPtr[4], poly_block);
+	polyBlock = GET_RELOC_MODEL_DATA(int, gCarCleanModelPtr[MAX_CAR_RESIDENT_MODELS - 1], poly_block);
 
 	if (specBlocksToLoad == 0 || modelMemory > polyBlock)
 	{		
@@ -1769,14 +1769,14 @@ void CleanModelSpooled(void)
 		modelMemory = polyBlock;
 
 #if MODEL_RELOCATE_POINTERS
-		gCarCleanModelPtr[4]->vertices += (int)gCarCleanModelPtr[4];
-		gCarCleanModelPtr[4]->normals += (int)gCarCleanModelPtr[4];
-		gCarCleanModelPtr[4]->point_normals += (int)gCarCleanModelPtr[4];
-		gCarCleanModelPtr[4]->poly_block += (int)gCarCleanModelPtr[4];
+		gCarCleanModelPtr[MAX_CAR_RESIDENT_MODELS-1]->vertices += (int)gCarCleanModelPtr[MAX_CAR_RESIDENT_MODELS - 1];
+		gCarCleanModelPtr[MAX_CAR_RESIDENT_MODELS-1]->normals += (int)gCarCleanModelPtr[MAX_CAR_RESIDENT_MODELS - 1];
+		gCarCleanModelPtr[MAX_CAR_RESIDENT_MODELS-1]->point_normals += (int)gCarCleanModelPtr[MAX_CAR_RESIDENT_MODELS - 1];
+		gCarCleanModelPtr[MAX_CAR_RESIDENT_MODELS-1]->poly_block += (int)gCarCleanModelPtr[MAX_CAR_RESIDENT_MODELS - 1];
 #endif
-		gCarCleanModelPtr[4]->instance_number = -1;
-		NewCarModel[4].nlist = GET_MODEL_DATA(SVECTOR, gCarCleanModelPtr[4], point_normals);
-		NewCarModel[4].vlist = GET_MODEL_DATA(SVECTOR, gCarCleanModelPtr[4], vertices);
+		gCarCleanModelPtr[MAX_CAR_RESIDENT_MODELS - 1]->instance_number = -1;
+		NewCarModel[MAX_CAR_RESIDENT_MODELS-1].nlist = GET_MODEL_DATA(SVECTOR, gCarCleanModelPtr[MAX_CAR_RESIDENT_MODELS-1], point_normals);
+		NewCarModel[MAX_CAR_RESIDENT_MODELS-1].vlist = GET_MODEL_DATA(SVECTOR, gCarCleanModelPtr[MAX_CAR_RESIDENT_MODELS-1], vertices);
 	}
 
 	if (quickSpool != 1)
@@ -1796,14 +1796,14 @@ void DamagedModelSpooled(void)
 	if (specBlocksToLoad == lengthDamBlock-1) 
 	{
 		loadaddr = (int *)(specLoadBuffer + damOffset);
-		gCarDamModelPtr[4] = (MODEL *)modelMemory;
+		gCarDamModelPtr[MAX_CAR_RESIDENT_MODELS - 1] = (MODEL *)modelMemory;
 	}
 	
 	// memcpy
 	while (loadaddr < (int*)(specLoadBuffer + CDSECTOR_SIZE))
 		*modelMemory++ = *loadaddr++;
 
-	polyBlock = GET_RELOC_MODEL_DATA(int, gCarDamModelPtr[4], poly_block);
+	polyBlock = GET_RELOC_MODEL_DATA(int, gCarDamModelPtr[MAX_CAR_RESIDENT_MODELS - 1], poly_block);
 
 	if (specBlocksToLoad == 0 || modelMemory > polyBlock)
 	{		
@@ -1811,12 +1811,12 @@ void DamagedModelSpooled(void)
 		modelMemory = polyBlock;
 
 #if MODEL_RELOCATE_POINTERS
-		gCarDamModelPtr[4]->vertices += (int)gCarDamModelPtr[4];
-		gCarDamModelPtr[4]->normals += (int)gCarDamModelPtr[4];
-		gCarDamModelPtr[4]->poly_block += (int)gCarDamModelPtr[4];
-		gCarDamModelPtr[4]->point_normals += (int)gCarDamModelPtr[4];
+		gCarDamModelPtr[MAX_CAR_RESIDENT_MODELS-1]->vertices += (int)gCarDamModelPtr[MAX_CAR_RESIDENT_MODELS - 1];
+		gCarDamModelPtr[MAX_CAR_RESIDENT_MODELS-1]->normals += (int)gCarDamModelPtr[MAX_CAR_RESIDENT_MODELS - 1];
+		gCarDamModelPtr[MAX_CAR_RESIDENT_MODELS-1]->poly_block += (int)gCarDamModelPtr[MAX_CAR_RESIDENT_MODELS - 1];
+		gCarDamModelPtr[MAX_CAR_RESIDENT_MODELS-1]->point_normals += (int)gCarDamModelPtr[MAX_CAR_RESIDENT_MODELS - 1];
 #endif
-		gCarDamModelPtr[4]->instance_number = -1;
+		gCarDamModelPtr[MAX_CAR_RESIDENT_MODELS - 1]->instance_number = -1;
 	}
 
 	if (quickSpool != 1)
@@ -1836,14 +1836,14 @@ void LowModelSpooled(void)
 	if (specBlocksToLoad == lengthLowBlock - 1) 
 	{
 		loadaddr = (int *)(specLoadBuffer + lowOffset);
-		gCarLowModelPtr[4] = (MODEL *)modelMemory;
+		gCarLowModelPtr[MAX_CAR_RESIDENT_MODELS - 1] = (MODEL *)modelMemory;
 	}
 	
 	// memcpy
 	while (loadaddr < (int*)(specLoadBuffer + CDSECTOR_SIZE))
 		*modelMemory++ = *loadaddr++;
 
-	polyBlock = GET_RELOC_MODEL_DATA(int, gCarLowModelPtr[4], poly_block);
+	polyBlock = GET_RELOC_MODEL_DATA(int, gCarLowModelPtr[MAX_CAR_RESIDENT_MODELS - 1], poly_block);
 
 	if (specBlocksToLoad == 0 || modelMemory > polyBlock)
 	{
@@ -1851,14 +1851,14 @@ void LowModelSpooled(void)
 		modelMemory = polyBlock;
 
 #if MODEL_RELOCATE_POINTERS
-		gCarLowModelPtr[4]->vertices += (int)gCarLowModelPtr[4];
-		gCarLowModelPtr[4]->normals += (int)gCarLowModelPtr[4];
-		gCarLowModelPtr[4]->poly_block += (int)gCarLowModelPtr[4];
-		gCarLowModelPtr[4]->point_normals += (int)gCarLowModelPtr[4];
+		gCarLowModelPtr[MAX_CAR_RESIDENT_MODELS-1]->vertices += (int)gCarLowModelPtr[MAX_CAR_RESIDENT_MODELS - 1];
+		gCarLowModelPtr[MAX_CAR_RESIDENT_MODELS-1]->normals += (int)gCarLowModelPtr[MAX_CAR_RESIDENT_MODELS - 1];
+		gCarLowModelPtr[MAX_CAR_RESIDENT_MODELS-1]->poly_block += (int)gCarLowModelPtr[MAX_CAR_RESIDENT_MODELS - 1];
+		gCarLowModelPtr[MAX_CAR_RESIDENT_MODELS-1]->point_normals += (int)gCarLowModelPtr[MAX_CAR_RESIDENT_MODELS - 1];
 #endif
-		gCarLowModelPtr[4]->instance_number = -1;
-		NewLowCarModel[4].nlist = GET_MODEL_DATA(SVECTOR, gCarLowModelPtr[4], point_normals);
-		NewLowCarModel[4].vlist = GET_MODEL_DATA(SVECTOR, gCarLowModelPtr[4], vertices);
+		gCarLowModelPtr[MAX_CAR_RESIDENT_MODELS - 1]->instance_number = -1;
+		NewLowCarModel[MAX_CAR_RESIDENT_MODELS-1].nlist = GET_MODEL_DATA(SVECTOR, gCarLowModelPtr[MAX_CAR_RESIDENT_MODELS-1], point_normals);
+		NewLowCarModel[MAX_CAR_RESIDENT_MODELS-1].vlist = GET_MODEL_DATA(SVECTOR, gCarLowModelPtr[MAX_CAR_RESIDENT_MODELS-1], vertices);
 	}
 
 	if (quickSpool != 1)
@@ -1912,33 +1912,33 @@ void CleanSpooled(void)
 		{
 			char* mem;
 
-			if (mem = LoadCarModelFromFile((char*)modelMemory, MissionHeader->residentModels[4], CAR_MODEL_CLEAN))
+			if (mem = LoadCarModelFromFile((char*)modelMemory, missionResidentCarModels[MAX_CAR_RESIDENT_MODELS - 1], CAR_MODEL_CLEAN))
 			{
-				gCarCleanModelPtr[4] = (MODEL*)modelMemory;
+				gCarCleanModelPtr[MAX_CAR_RESIDENT_MODELS - 1] = (MODEL*)modelMemory;
 				model = GetCarModel(mem, (char**)&modelMemory, 1);
 
 				whichCP = baseSpecCP;
-				buildNewCarFromModel(4, 1, mem, model);
+				buildNewCarFromModel(MAX_CAR_RESIDENT_MODELS - 1, 1, mem, model);
 
 				specBlocksToLoad = 0;
 				specialState = SpecSpool_CleanModel;
 			}
 
-			if (mem = LoadCarModelFromFile((char*)modelMemory, MissionHeader->residentModels[4], CAR_MODEL_DAMAGED))
+			if (mem = LoadCarModelFromFile((char*)modelMemory, missionResidentCarModels[MAX_CAR_RESIDENT_MODELS - 1], CAR_MODEL_DAMAGED))
 			{
-				gCarDamModelPtr[4] = (MODEL*)modelMemory;
+				gCarDamModelPtr[MAX_CAR_RESIDENT_MODELS - 1] = (MODEL*)modelMemory;
 				model = GetCarModel(mem, (char**)&modelMemory, 0);
 				
 				specBlocksToLoad = 0;
 				specialState = SpecSpool_DamagedModel;
 			}
 
-			if (mem = LoadCarModelFromFile((char*)modelMemory, MissionHeader->residentModels[4], CAR_MODEL_LOWDETAIL))
+			if (mem = LoadCarModelFromFile((char*)modelMemory, missionResidentCarModels[MAX_CAR_RESIDENT_MODELS - 1], CAR_MODEL_LOWDETAIL))
 			{
-				gCarLowModelPtr[4] = (MODEL*)modelMemory;
+				gCarLowModelPtr[MAX_CAR_RESIDENT_MODELS - 1] = (MODEL*)modelMemory;
 				model = GetCarModel(mem, (char**)&modelMemory, 1);
 
-				buildNewCarFromModel(4, 0, mem, model);
+				buildNewCarFromModel(MAX_CAR_RESIDENT_MODELS - 1, 0, mem, model);
 
 				specBlocksToLoad = 0;
 				specialState = SpecSpool_LowModel;
@@ -1955,7 +1955,7 @@ void CleanSpooled(void)
 		model = (MODEL*)(specmallocptr + sizeof(int) * 3);
 
 		whichCP = baseSpecCP;
-		buildNewCarFromModel(4, 1, (char*)model, model);
+		buildNewCarFromModel(MAX_CAR_RESIDENT_MODELS - 1, 1, (char*)model, model);
 
 #if MODEL_RELOCATE_POINTERS
 		model->vertices += (int)model;
@@ -1978,7 +1978,7 @@ void LowSpooled(void)
 	if (specBlocksToLoad == 0) 
 	{
 		model = (MODEL *)(specmallocptr + lowOffset);
-		buildNewCarFromModel(4, 0, (char*)model, model);
+		buildNewCarFromModel(MAX_CAR_RESIDENT_MODELS - 1, 0, (char*)model, model);
 
 #if MODEL_RELOCATE_POINTERS
 		model->vertices += (int)model;
@@ -2162,14 +2162,14 @@ void CheckSpecialSpool(void)
 		specialState == SpecSpool_None &&
 		GameType != GAME_PURSUIT &&
 		LoadedArea != -1 &&
-		SpecialByRegion[GameLevel][LoadedArea] != MissionHeader->residentModels[4] - 7) 
+		SpecialByRegion[GameLevel][LoadedArea] != missionResidentCarModels[MAX_CAR_RESIDENT_MODELS - 1] - 7)
 	{
 		lcp = car_data;
 
 		// if there are cars that still using special models, deny spooling
 		do	// [A]
 		{
-			if (MissionHeader->residentModels[lcp->ap.model] > 4)
+			if (missionResidentCarModels[lcp->ap.model] > 5)
 				return;
 
 			lcp++;
@@ -2179,12 +2179,12 @@ void CheckSpecialSpool(void)
 		specModelValid = 0;
 		startSpecSpool = CameraCnt;
 
-		gCarDamModelPtr[4] = NULL;
-		gCarCleanModelPtr[4] = NULL;
-		gCarLowModelPtr[4] = NULL;
+		gCarDamModelPtr[MAX_CAR_RESIDENT_MODELS - 1] = NULL;
+		gCarCleanModelPtr[MAX_CAR_RESIDENT_MODELS - 1] = NULL;
+		gCarLowModelPtr[MAX_CAR_RESIDENT_MODELS - 1] = NULL;
 
 		specSpoolModelIndex = SpecialByRegion[GameLevel][LoadedArea];
-		MissionHeader->residentModels[4] = specSpoolModelIndex + 7;
+		missionResidentCarModels[MAX_CAR_RESIDENT_MODELS - 1] = specSpoolModelIndex + 7;
 
 		SpecialStartNextBlock();
 	}
@@ -2197,11 +2197,11 @@ void QuickSpoolSpecial(void)
 	specialState = SpecSpool_None;
 	specBlocksToLoad = 0;
 
-	gCarCleanModelPtr[4] = NULL;
-	gCarDamModelPtr[4] = NULL;
-	gCarLowModelPtr[4] = NULL;
+	gCarCleanModelPtr[MAX_CAR_RESIDENT_MODELS - 1] = NULL;
+	gCarDamModelPtr[MAX_CAR_RESIDENT_MODELS-1] = NULL;
+	gCarLowModelPtr[MAX_CAR_RESIDENT_MODELS-1] = NULL;
 
-	specSpoolModelIndex = MissionHeader->residentModels[4] - 7;
+	specSpoolModelIndex = missionResidentCarModels[MAX_CAR_RESIDENT_MODELS - 1] - 7;
 
 	do {
 		SpoolSYNC();
@@ -2215,7 +2215,7 @@ void QuickSpoolSpecial(void)
 void PrepareSecretCar(void)
 {
 	// [A] Don't do anything if model is already spooled
-	if (MissionHeader->residentModels[4] == 12)
+	if (missionResidentCarModels[MAX_CAR_RESIDENT_MODELS - 1] == 12)
 	{
 		return;
 	}
@@ -2223,12 +2223,12 @@ void PrepareSecretCar(void)
 	allowSpecSpooling = 0;
 	PingOutAllSpecialCivCars();
 
-	gCarDamModelPtr[4] = NULL;
-	gCarCleanModelPtr[4] = NULL;
-	gCarLowModelPtr[4] = NULL;
+	gCarDamModelPtr[MAX_CAR_RESIDENT_MODELS - 1] = NULL;
+	gCarCleanModelPtr[MAX_CAR_RESIDENT_MODELS - 1] = NULL;
+	gCarLowModelPtr[MAX_CAR_RESIDENT_MODELS - 1] = NULL;
 
 	specSpoolModelIndex = 5;
-	MissionHeader->residentModels[4] = 12;
+	missionResidentCarModels[MAX_CAR_RESIDENT_MODELS - 1] = 12;
 
 	specModelValid = 0;
 	startSpecSpool = CameraCnt;
@@ -2327,6 +2327,9 @@ void InitSpecSpool(void)
 	if(gDemoLevel)
 		allowSpecSpooling = 0;
 #endif
+
+	if(missionResidentCarModels[MAX_CAR_RESIDENT_MODELS - 1] < 8)
+		allowSpecSpooling = 0;
 
 	specModelValid = 1;
 	specialState = SpecSpool_None;

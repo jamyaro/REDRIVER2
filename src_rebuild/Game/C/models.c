@@ -251,23 +251,23 @@ int ProcessCarModelLump(char *lump_ptr, int lump_size)
 
 	startBuildNewCars(0);
 
-	for (i = 0; i < MAX_CAR_MODELS; i++)
+	for (i = 0; i < MAX_CAR_RESIDENT_MODELS; i++)
 	{
 		gCarCleanModelPtr[i] = NULL;
 		gCarDamModelPtr[i] = NULL;
 		gCarLowModelPtr[i] = NULL;
 
-		if (i == MAX_CAR_MODELS-1)
+		if (i == MAX_CAR_RESIDENT_MODELS-1)
 		{
 			startBuildNewCars(1);
 			specmallocptr = (char*)mallocptr;
 		}
 
-		model_number = MissionHeader->residentModels[i];
+		model_number = missionResidentCarModels[i];
 
 		if (model_number == 13)
 		{
-			model_number = 10 - (MissionHeader->residentModels[0] + MissionHeader->residentModels[1] + MissionHeader->residentModels[2]);
+			model_number = 10 - (missionResidentCarModels[0] + missionResidentCarModels[1] + missionResidentCarModels[2]);
 
 			if (model_number < 1)
 				model_number = 1;

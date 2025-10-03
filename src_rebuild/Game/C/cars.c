@@ -79,20 +79,22 @@ DENTUVS *gTempCarUVPtr;
 DENTUVS gTempHDCarUVDump[MAX_CARS][MAX_DENTING_UVS];
 DENTUVS gTempLDCarUVDump[MAX_CARS][MAX_DENTING_LOD_UVS];
 
-CAR_MODEL NewCarModel[MAX_CAR_MODELS];
-CAR_MODEL NewLowCarModel[MAX_CAR_MODELS];
+CAR_MODEL NewCarModel[MAX_CAR_RESIDENT_MODELS];
+CAR_MODEL NewLowCarModel[MAX_CAR_RESIDENT_MODELS];
 
-MODEL* gCarLowModelPtr[MAX_CAR_MODELS];
-MODEL* gCarDamModelPtr[MAX_CAR_MODELS];
-MODEL* gCarCleanModelPtr[MAX_CAR_MODELS];
+MODEL* gCarLowModelPtr[MAX_CAR_RESIDENT_MODELS];
+MODEL* gCarDamModelPtr[MAX_CAR_RESIDENT_MODELS];
+MODEL* gCarCleanModelPtr[MAX_CAR_RESIDENT_MODELS];
 
 // pedestrian palette at 0 and next are cars
 // model_id, texture_number, palette
 u_short civ_clut[8][32][6];
 
+#define MAX_CAR_POLYS	(200 * 2) * MAX_CAR_RESIDENT_MODELS
+
 int whichCP = 0;
 int baseSpecCP = 0;
-CAR_POLY carPolyBuffer[2001];
+CAR_POLY carPolyBuffer[MAX_CAR_POLYS + 1];
 
 char LeftLight = 0;
 char RightLight = 0;
@@ -1065,7 +1067,7 @@ void buildNewCarFromModel(int index, int detail, char* polySrc, MODEL* model)
 
 		newNumPolys = whichCP;
 
-		for (i = 0; newNumPolys < 2000 && i < model->num_polys; i++)
+		for (i = 0; newNumPolys < MAX_CAR_POLYS && i < model->num_polys; i++)
 		{
 			ptype = *polyList;
 
