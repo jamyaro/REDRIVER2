@@ -343,6 +343,9 @@ void SetupResidentModels()
 			break;
 		}
 	}
+	if (missionResidentCarModels[3] != 0)
+		missionResidentCarModels[4] = missionResidentCarModels[3];
+
 	missionResidentCarModels[MAX_CAR_RESIDENT_MODELS - 1] = MissionHeader->residentModels[4];
 #endif // MAX_CAR_RESIDENT_MODELS > 5
 
