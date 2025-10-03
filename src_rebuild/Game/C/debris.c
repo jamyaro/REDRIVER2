@@ -4001,7 +4001,7 @@ int GetDebrisColour(CAR_DATA *cp)
 {
 	int car_model;
 
-	car_model = missionResidentCarModels[cp->ap.model];
+	car_model = residentCarModels[cp->ap.model];
 
 	if (car_model == 0)
 		return 1;

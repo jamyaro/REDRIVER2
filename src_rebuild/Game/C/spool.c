@@ -1912,7 +1912,7 @@ void CleanSpooled(void)
 		{
 			char* mem;
 
-			if (mem = LoadCarModelFromFile((char*)modelMemory, missionResidentCarModels[MAX_CAR_RESIDENT_MODELS - 1], CAR_MODEL_CLEAN))
+			if (mem = LoadCarModelFromFile((char*)modelMemory, residentCarModels[MAX_CAR_RESIDENT_MODELS - 1], CAR_MODEL_CLEAN))
 			{
 				gCarCleanModelPtr[MAX_CAR_RESIDENT_MODELS - 1] = (MODEL*)modelMemory;
 				model = GetCarModel(mem, (char**)&modelMemory, 1);
@@ -1924,7 +1924,7 @@ void CleanSpooled(void)
 				specialState = SpecSpool_CleanModel;
 			}
 
-			if (mem = LoadCarModelFromFile((char*)modelMemory, missionResidentCarModels[MAX_CAR_RESIDENT_MODELS - 1], CAR_MODEL_DAMAGED))
+			if (mem = LoadCarModelFromFile((char*)modelMemory, residentCarModels[MAX_CAR_RESIDENT_MODELS - 1], CAR_MODEL_DAMAGED))
 			{
 				gCarDamModelPtr[MAX_CAR_RESIDENT_MODELS - 1] = (MODEL*)modelMemory;
 				model = GetCarModel(mem, (char**)&modelMemory, 0);
@@ -1933,7 +1933,7 @@ void CleanSpooled(void)
 				specialState = SpecSpool_DamagedModel;
 			}
 
-			if (mem = LoadCarModelFromFile((char*)modelMemory, missionResidentCarModels[MAX_CAR_RESIDENT_MODELS - 1], CAR_MODEL_LOWDETAIL))
+			if (mem = LoadCarModelFromFile((char*)modelMemory, residentCarModels[MAX_CAR_RESIDENT_MODELS - 1], CAR_MODEL_LOWDETAIL))
 			{
 				gCarLowModelPtr[MAX_CAR_RESIDENT_MODELS - 1] = (MODEL*)modelMemory;
 				model = GetCarModel(mem, (char**)&modelMemory, 1);
@@ -2162,14 +2162,14 @@ void CheckSpecialSpool(void)
 		specialState == SpecSpool_None &&
 		GameType != GAME_PURSUIT &&
 		LoadedArea != -1 &&
-		SpecialByRegion[GameLevel][LoadedArea] != missionResidentCarModels[MAX_CAR_RESIDENT_MODELS - 1] - 7)
+		SpecialByRegion[GameLevel][LoadedArea] != residentCarModels[MAX_CAR_RESIDENT_MODELS - 1] - 7)
 	{
 		lcp = car_data;
 
 		// if there are cars that still using special models, deny spooling
 		do	// [A]
 		{
-			if (missionResidentCarModels[lcp->ap.model] > 5)
+			if (residentCarModels[lcp->ap.model] > 5)
 				return;
 
 			lcp++;
@@ -2184,7 +2184,7 @@ void CheckSpecialSpool(void)
 		gCarLowModelPtr[MAX_CAR_RESIDENT_MODELS - 1] = NULL;
 
 		specSpoolModelIndex = SpecialByRegion[GameLevel][LoadedArea];
-		missionResidentCarModels[MAX_CAR_RESIDENT_MODELS - 1] = specSpoolModelIndex + 7;
+		residentCarModels[MAX_CAR_RESIDENT_MODELS - 1] = specSpoolModelIndex + 7;
 
 		SpecialStartNextBlock();
 	}
@@ -2201,7 +2201,7 @@ void QuickSpoolSpecial(void)
 	gCarDamModelPtr[MAX_CAR_RESIDENT_MODELS-1] = NULL;
 	gCarLowModelPtr[MAX_CAR_RESIDENT_MODELS-1] = NULL;
 
-	specSpoolModelIndex = missionResidentCarModels[MAX_CAR_RESIDENT_MODELS - 1] - 7;
+	specSpoolModelIndex = residentCarModels[MAX_CAR_RESIDENT_MODELS - 1] - 7;
 
 	do {
 		SpoolSYNC();
@@ -2215,7 +2215,7 @@ void QuickSpoolSpecial(void)
 void PrepareSecretCar(void)
 {
 	// [A] Don't do anything if model is already spooled
-	if (missionResidentCarModels[MAX_CAR_RESIDENT_MODELS - 1] == 12)
+	if (residentCarModels[MAX_CAR_RESIDENT_MODELS - 1] == 12)
 	{
 		return;
 	}
@@ -2228,7 +2228,7 @@ void PrepareSecretCar(void)
 	gCarLowModelPtr[MAX_CAR_RESIDENT_MODELS - 1] = NULL;
 
 	specSpoolModelIndex = 5;
-	missionResidentCarModels[MAX_CAR_RESIDENT_MODELS - 1] = 12;
+	residentCarModels[MAX_CAR_RESIDENT_MODELS - 1] = 12;
 
 	specModelValid = 0;
 	startSpecSpool = CameraCnt;
@@ -2328,7 +2328,7 @@ void InitSpecSpool(void)
 		allowSpecSpooling = 0;
 #endif
 
-	if(missionResidentCarModels[MAX_CAR_RESIDENT_MODELS - 1] < 8)
+	if(residentCarModels[MAX_CAR_RESIDENT_MODELS - 1] < 8)
 		allowSpecSpooling = 0;
 
 	specModelValid = 1;

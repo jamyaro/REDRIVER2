@@ -1595,7 +1595,7 @@ int PingOutAllSpecialCivCars(void)
 
 	do
 	{
-		if (lcp->controlType == CONTROL_TYPE_CIV_AI && missionResidentCarModels[lcp->ap.model] > 4)
+		if (lcp->controlType == CONTROL_TYPE_CIV_AI && residentCarModels[lcp->ap.model] > 4)
 			PingOutCar(lcp);
 
 		lcp++;
@@ -1793,7 +1793,7 @@ int CreateStationaryCivCar(int direction, int orientX, int orientZ, LONGVECTOR4*
 	model = -1;
 	for(i = 0; i < MAX_CAR_RESIDENT_MODELS; ++i)
 	{
-		if (missionResidentCarModels[i] == externalModel)
+		if (residentCarModels[i] == externalModel)
 		{
 			model = i;
 			break;
@@ -2169,7 +2169,7 @@ int PingInCivCar(int minPingInDist)
 	}
 
 	// check if special car is loaded and add it to random list
-	if ((specModelValid == 0 || allowSpecSpooling == 0 || missionResidentCarModels[MAX_CAR_RESIDENT_MODELS-1] == 12) && missionResidentCarModels[MAX_CAR_RESIDENT_MODELS-1] >= 8)
+	if ((specModelValid == 0 || allowSpecSpooling == 0 || residentCarModels[MAX_CAR_RESIDENT_MODELS-1] == 12) && residentCarModels[MAX_CAR_RESIDENT_MODELS-1] >= 8)
 	{
 #if MAX_CAR_RESIDENT_MODELS == 6
 		modelRandomList[15] = 4;
@@ -2225,7 +2225,7 @@ int PingInCivCar(int minPingInDist)
 		model = MAX_CAR_RESIDENT_MODELS - 1;
 
 	// select car color palette
-	if (missionResidentCarModels[model] == 0 || missionResidentCarModels[model] > 4)
+	if (residentCarModels[model] == 0 || residentCarModels[model] > 4)
 	{
 		civDat.palette = 0;
 	}
@@ -3299,7 +3299,7 @@ void CreateRoadblock(void)
 	noMoreCars = 0;
 	distAlongSegment = -5;
 	lbody = car_cosmetics[3].colBox.vz;
-	externalCopModel = missionResidentCarModels[3];
+	externalCopModel = residentCarModels[3];
 
 	// [A] use player instead of car
 	dir = player[0].dir;

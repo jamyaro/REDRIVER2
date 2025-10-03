@@ -263,11 +263,11 @@ int ProcessCarModelLump(char *lump_ptr, int lump_size)
 			specmallocptr = (char*)mallocptr;
 		}
 
-		model_number = missionResidentCarModels[i];
+		model_number = residentCarModels[i];
 
 		if (model_number == 13)
 		{
-			model_number = 10 - (missionResidentCarModels[0] + missionResidentCarModels[1] + missionResidentCarModels[2]);
+			model_number = 10 - (residentCarModels[0] + residentCarModels[1] + residentCarModels[2]);
 
 			if (model_number < 1)
 				model_number = 1;

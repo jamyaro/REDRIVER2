@@ -33,7 +33,7 @@ void InitPlayer(PLAYER *locPlayer, CAR_DATA *cp, char carCtrlType, int direction
 		model = -1;
 		for (i = 0; i < MAX_CAR_RESIDENT_MODELS; ++i)
 		{
-			if (missionResidentCarModels[i] == playerType)
+			if (residentCarModels[i] == playerType)
 			{
 				model = i;
 				break;
@@ -212,7 +212,7 @@ void ChangePedPlayerToCar(int playerID, CAR_DATA *newCar)
 #endif
 		)
 		{
-			if (gCurrentMissionNumber != 32 && missionResidentCarModels[newCar->ap.model] == 0)
+			if (gCurrentMissionNumber != 32 && residentCarModels[newCar->ap.model] == 0)
 			{
 				NoteFelony(&felonyData, 11, 4096);
 			}

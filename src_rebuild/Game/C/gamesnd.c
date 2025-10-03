@@ -169,22 +169,22 @@ int CarHasSiren(int index)
 	{
 		if (GameLevel == 0)
 		{
-			if (missionResidentCarModels[MAX_CAR_RESIDENT_MODELS - 1] == 8)
+			if (residentCarModels[MAX_CAR_RESIDENT_MODELS - 1] == 8)
 				return M_SHRT_2(SOUND_BANK_SFX, 12);
 		}
 		else if (GameLevel == 2)
 		{
-			if (missionResidentCarModels[MAX_CAR_RESIDENT_MODELS - 1] == 9)
+			if (residentCarModels[MAX_CAR_RESIDENT_MODELS - 1] == 9)
 				return M_SHRT_2(SOUND_BANK_SFX, 12);
 		}
 		else if (GameLevel == 3)
 		{
-			if (missionResidentCarModels[MAX_CAR_RESIDENT_MODELS - 1] == 10)
+			if (residentCarModels[MAX_CAR_RESIDENT_MODELS - 1] == 10)
 				return M_SHRT_2(SOUND_BANK_SFX, 12);
 		}
 	}
 
-	return M_SHRT_2((missionResidentCarModels[index] == 0) ? SOUND_BANK_VOICES : 0, 0);
+	return M_SHRT_2((residentCarModels[index] == 0) ? SOUND_BANK_VOICES : 0, 0);
 }
 
 // [D] [T]
@@ -215,7 +215,7 @@ int ResidentModelsBodge(void)
 		return 3;
 	}
 
-	j = missionResidentCarModels[MAX_CAR_RESIDENT_MODELS - 1];
+	j = residentCarModels[MAX_CAR_RESIDENT_MODELS - 1];
 
 	if (gCurrentMissionNumber - 50U < 16 && j == 12)
 	{
@@ -288,7 +288,7 @@ int MapCarIndexToBank(int index)
 	int model;
 	int ret;
 
-	RM = missionResidentCarModels;
+	RM = residentCarModels;
 
 	model = RM[index];
 
@@ -527,7 +527,7 @@ void LoadLevelSFX(int missionNum)
 
 		for (i = 0; i < 3; i++)
 		{
-			if (missionResidentCarModels[i] == missionResidentCarModels[3])
+			if (residentCarModels[i] == residentCarModels[3])
 				cop_model = i;
 		}
 	}

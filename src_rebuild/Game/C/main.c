@@ -493,7 +493,7 @@ void State_GameInit(void* param)
 	LoadMission(gCurrentMissionNumber);
 
 	if (gCurrentMissionNumber == 38)
-		missionResidentCarModels[MAX_CAR_RESIDENT_MODELS - 1] = 9;
+		residentCarModels[MAX_CAR_RESIDENT_MODELS - 1] = 9;
 
 	if (GameType == GAME_MISSION)
 		SetupFadePolys();
@@ -892,7 +892,7 @@ void StepSim(void)
 		}
 		else
 		{
-			if (copsAreInPursuit != 0 && missionResidentCarModels[3] == 0 && gCurrentMissionNumber != 26)
+			if (copsAreInPursuit != 0 && residentCarModels[3] == 0 && gCurrentMissionNumber != 26)
 				requestRoadblock = 1;
 
 			if (roadblockCount != 0)

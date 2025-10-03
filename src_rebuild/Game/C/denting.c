@@ -410,11 +410,11 @@ void ProcessDentLump(char *lump_ptr, int lump_size)
 
 	for (i = 0; i < MAX_CAR_RESIDENT_MODELS; i++)
 	{
-		model = missionResidentCarModels[i];
+		model = residentCarModels[i];
 
 		if (model == 13)
 		{
-			model = 10 - (missionResidentCarModels[0] + missionResidentCarModels[1] + missionResidentCarModels[2]);
+			model = 10 - (residentCarModels[0] + residentCarModels[1] + residentCarModels[2]);
 
 			if (model < 1) 
 				model = 1;
@@ -461,7 +461,7 @@ void SetupSpecDenting(char *loadbuffer)
 	{
 		char* newDenting;
 		int model;
-		model = missionResidentCarModels[MAX_CAR_RESIDENT_MODELS - 1];
+		model = residentCarModels[MAX_CAR_RESIDENT_MODELS - 1];
 
 		newDenting = LoadCustomCarDentingFromFile(NULL, model);
 		if (newDenting)
