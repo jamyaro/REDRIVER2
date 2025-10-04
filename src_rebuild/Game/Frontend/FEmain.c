@@ -92,12 +92,15 @@ void InitHiresFEFont()
 	}
 }
 
-void FEGetHiresBakedQuad(int char_index, float scale, float* xpos, float* ypos, FEFONT_QUAD* q)
+int FEGetHiresBakedQuad(int char_index, float scale, float* xpos, float* ypos, FEFONT_QUAD* q)
 {
 	float ipw = 1.0f / (float)HIRES_FONT_SIZE_W;
 	float iph = 1.0f / (float)HIRES_FONT_SIZE_H;
 
-	const OUT_FN2INFO* b = gHiresFEFontCharData[0] + char_index - gHiresFEFontRanges[0].start;
+	const int idx = char_index - gHiresFEFontRanges[0].start;
+	if (idx < 0)
+		return 0;
+	const OUT_FN2INFO* b = gHiresFEFontCharData[0] + idx;
 
 	float fscale = 0.5f * scale;
 
@@ -117,6 +120,8 @@ void FEGetHiresBakedQuad(int char_index, float scale, float* xpos, float* ypos, 
 	q->y0 += 32.0f;
 
 	*xpos += b->xadvance * fscale;
+
+	return 1;
 }
 
 void SetHiresFEFontTexture(int enabled)
@@ -149,7 +154,8 @@ int FEStringWidthHires(char* string)
 		fx = 0;
 		fy = 0;
 		FEFONT_QUAD q;
-		FEGetHiresBakedQuad(c, 1.0f, &fx, &fy, &q);
+		if (!FEGetHiresBakedQuad(c, 1.0f, &fx, &fy, &q))
+			continue;
 
 		w += fx;
 	}
@@ -180,7 +186,8 @@ int FEPrintStringSizedHires(char* string, int x, int y, int scale, int transpare
 		fx = x;
 		fy = y;
 		FEFONT_QUAD q;
-		FEGetHiresBakedQuad(let, scale / 4096.0f, &fx, &fy, &q);
+		if (!FEGetHiresBakedQuad(let, scale / 4096.0f, &fx, &fy, &q))
+			continue;
 
 		setPolyFT4(font);
 		setSemiTrans(font, 1);
