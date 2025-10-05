@@ -14,9 +14,10 @@ extern FELONY_DATA felonyData;
 extern void InitFelonySystem(); // 0x0004D280
 extern void CheckPlayerMiscFelonies(); // 0x0004CC28
 
-extern int GetCarHeading(int direction); // 0x0004D420
+extern int GetHeading(int direction); // 0x0004D420
 
-extern char GetCarDirectionOfTravel(CAR_DATA *cp); // 0x0004D430
+extern char GetCarDirectionOfTravel(CAR_DATA* cp); // 0x0004D430
+extern char GetPlayerDirectionOfTravel(PLAYER* pl);
 
 extern void CarHitByPlayer(CAR_DATA* victim, int howHard); // 0x0004D2B8
 

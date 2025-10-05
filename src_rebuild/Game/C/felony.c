@@ -69,19 +69,30 @@ void InitFelonyData(FELONY_DATA *pFelonyData)
 }
 
 // [D] [T]
-int GetCarHeading(int direction)
+static int GetHeading(int direction)
 {
-	return (direction + 0x200U & 0xfff) >> 10;
+	return (direction + 512U & 4095) >> 10;
 }
 
 // [D] [T]
-char GetCarDirectionOfTravel(CAR_DATA *cp)
+char GetCarDirectionOfTravel(CAR_DATA* cp)
 {
 	int direction;
+	direction = GetHeading(cp->hd.direction);
 
-	direction = GetCarHeading(cp->hd.direction);;
+	if (cp->hd.wheel_speed < 0)
+		direction = direction + 2 & 3;
 
-	if (cp->hd.wheel_speed < 0) 
+	return direction;
+}
+
+// [A]
+char GetPlayerDirectionOfTravel(PLAYER* pl)
+{
+	int direction;
+	direction = GetHeading(pl->dir);
+
+	if (pl->playerCarId >= 0 && car_data[pl->playerCarId].hd.wheel_speed < 0)
 		direction = direction + 2 & 3;
 
 	return direction;
@@ -172,7 +183,7 @@ void NoteFelony(FELONY_DATA *pFelonyData, char type, short scale)
 	{
 		// say something..
 		rnd = Random2(1);
-		dir = GetCarDirectionOfTravel(&car_data[player[0].playerCarId]);
+		dir = GetPlayerDirectionOfTravel(&player[0]);
 
 		switch (type)
 		{
