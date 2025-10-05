@@ -2169,7 +2169,7 @@ int PingInCivCar(int minPingInDist)
 	}
 
 	// check if special car is loaded and add it to random list
-	if ((specModelValid == 0 || allowSpecSpooling == 0 || residentCarModels[MAX_CAR_RESIDENT_MODELS-1] == 12) && residentCarModels[MAX_CAR_RESIDENT_MODELS-1] >= 8)
+	if ((specModelValid == 0 || allowSpecSpooling == 0 || residentCarModels[MAX_CAR_RESIDENT_MODELS - 1] == 12) && residentCarModels[MAX_CAR_RESIDENT_MODELS - 1] != 13)
 	{
 #if MAX_CAR_RESIDENT_MODELS == 6
 		modelRandomList[15] = 4;
