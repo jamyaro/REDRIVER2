@@ -225,7 +225,7 @@ void State_GameStart(void* param)
 
 			break;
 		case GAME_TRAILBLAZER:
-			gCurrentMissionNumber = GameLevel * 8 + 260 + gWantNight * 4 + gSubGameNumber;
+			gCurrentMissionNumber = 260 + GameLevel * 8 + gWantNight * 4 + gSubGameNumber;
 			SetState(STATE_GAMELAUNCH);
 
 			break;

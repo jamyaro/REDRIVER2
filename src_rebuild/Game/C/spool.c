@@ -2240,87 +2240,41 @@ void PrepareSecretCar(void)
 // [D] [T]
 void InitSpecSpool(void)
 {
-	switch (gCurrentMissionNumber)
+	allowSpecSpooling = 1;
+
+	if (GameType == GAME_SECRET)
+		allowSpecSpooling = 0;
+	else if (NumPlayers == 2)
+		allowSpecSpooling = 0;
+	else if (gCurrentMissionNumber == 40)	// Chopper uses special texture slot
+		allowSpecSpooling = 0;
+	else if (gCurrentMissionNumber == 24)	// Car bomb getaway is only exception
+		allowSpecSpooling = 1;
+	else
 	{
-		case 2: 
-		case 4:
-		case 6:
-		case 7:
-		case 10:
-		case 11:
-		case 12:
-		case 13:
-		case 16:
-		case 18:
-		case 19:
-		case 20:
-		case 24:
-		case 26:
-		case 27:
-		case 29:
-		case 30:
-		case 31:
-		case 33:
-		case 35:
-		case 38:
-		case 39:
-		case 40:
-		case 58:
-		case 59:
-		case 60:
-		case 61:
-		case 62:
-		case 63:
-		case 64:
-		case 65:
-		case 70:
-		case 78:
-		case 86:
-		case 94:
-		case 228:
-		case 229:
-		case 236:
-		case 237:
-		case 244:
-		case 245:
-		case 252:
-		case 253:
-		case 352:
-		case 353:
-		case 360:
-		case 169:
-		case 368:
-		case 369:
-		case 376:
-		case 377:
-		case 420:
-		case 421:
-		case 428:
-		case 429:
-		case 436:
-		case 437:
-		case 444:
-		case 445:
-		case 480:
-		case 481:
-		case 482:
-		case 483:
-		case 484:
-		case 485:
-		case 486:
-		case 487:
-		case 498:
-		case 499:
-		case 500:
-		case 501:
-		case 502:
-		case 503:
-		case 504:
-		case 505:
-			allowSpecSpooling = 0;
-			break;
-		default:
-			allowSpecSpooling = 1;
+		// disable special model spooling
+		// if special car is used as target
+		// or there is random chase present
+		MS_TARGET* target;
+		int i;
+		for (i = 0; i < MAX_MISSION_TARGETS; ++i)
+		{
+			target = &MissionTargets[i];
+			if (target->type == Target_Car)
+			{
+				if (target->s.car.type == 3 && (target->s.car.flags & CARTARGET_FLAG_RANDOMCHASE))
+				{
+					allowSpecSpooling = 0;
+					break;
+				}
+
+				if (target->s.car.model == residentCarModels[MAX_CAR_RESIDENT_MODELS - 1])
+				{
+					allowSpecSpooling = 0;
+					break;
+				}
+			}
+		}
 	}
 
 #ifndef PSX
