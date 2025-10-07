@@ -2246,7 +2246,9 @@ void InitSpecSpool(void)
 		allowSpecSpooling = 0;
 	else if (NumPlayers == 2)
 		allowSpecSpooling = 0;
-	else if (gCurrentMissionNumber == 40)	// Chopper uses special texture slot
+	else if (
+		gCurrentMissionNumber == 7 || 		// Caine's Compound semi trucks
+		gCurrentMissionNumber == 40)		// Chopper uses special texture slot
 		allowSpecSpooling = 0;
 	else if (gCurrentMissionNumber == 24)	// Car bomb getaway is only exception
 		allowSpecSpooling = 1;
