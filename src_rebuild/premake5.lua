@@ -2,6 +2,7 @@
 
 require "premake_modules/usage"
 require "premake_modules/emscripten"
+require "premake_modules/vscode"
 
 IS_ANDROID = (_ACTION == "androidndk")
 
@@ -35,7 +36,15 @@ end
 ------------------------------------------
 	
 workspace "REDRIVER2"
-    location "project_%{_ACTION}_%{os.target()}"
+	if _ACTION ~= "vscode" then
+    	location "build"
+	else
+		-- setup VSCode generator settings
+		vscode_makefile "build"
+		vscode_launch_cwd ("${workspaceRoot}/../data")
+		--vscode_launch_environment {	}
+	end
+
     configurations { "Debug", "Release", "Release_dev" }
 	
     defines { VERSION } 
@@ -150,13 +159,8 @@ workspace "REDRIVER2"
 		cppdialect "C++11"
 		
 	filter {"system:Linux", "platforms:x86"}
-		buildoptions {
-			"-m32"
-		}
-		
-		linkoptions {
-			"-m32"
-		}
+		buildoptions { "-m32" }
+		linkoptions { "-m32" }
 
 	filter "system:Windows"
 		disablewarnings { "4996", "4554", "4244", "4101", "4838", "4309" }

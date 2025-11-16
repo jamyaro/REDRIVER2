@@ -15,8 +15,6 @@ project "FontTool"
         "utils/targa.*",
     }
 
-    defines {  }
-
     includedirs { 
 		"utils",
         "PsyCross/include/psx"

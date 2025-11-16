@@ -35,8 +35,9 @@ PSXToolchain/CDSrc/REDRIVER2.cue
 PSXToolchain/CDSrc/*.txt
 src_rebuild/dependencies/*
 src_rebuild/.vs/*
+src_rebuild/.vscode/*
 src_rebuild/bin/*
 src_rebuild/obj/*
-src_rebuild/project_*
+src_rebuild/build*
 src_rebuild/*.make
 src_rebuild/Makefile
