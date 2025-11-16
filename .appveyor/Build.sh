@@ -4,10 +4,10 @@ set -ex
 # Configure
 cd "$APPVEYOR_BUILD_FOLDER/src_rebuild"
 ./premake5 gmake2
-cd project_gmake2_linux
+cd build
 
 # Build
-for config in debug_x86 release_x86 release_dev_x86
+for config in debug_x64 release_x64 release_dev_x64
 do
     make config=$config -j$(nproc)
 done

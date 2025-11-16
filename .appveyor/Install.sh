@@ -14,9 +14,9 @@ sudo apt-get install -qq aptitude -y
 
 # fix Ubuntu's broken mess of packages using aptitude
 sudo aptitude install --quiet=2 \
-    libsdl2-dev:i386 \
-    libopenal-dev:i386 \
-    libjpeg-turbo8-dev:i386 \
+    libsdl2-dev \
+    libopenal-dev \
+    libjpeg-turbo8-dev \
     flatpak flatpak-builder -y
 
 # Setting XDG_DATA_DIRS environement variable for flatpak
