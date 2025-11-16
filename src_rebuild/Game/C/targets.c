@@ -328,7 +328,7 @@ void DrawStopZone(VECTOR *pPosition)
 
 		if (pOut == (int*)&pPoly->x0)
 			pOut = (int*)&pPoly->x1;
-		else if (pOut == (long*)&pPoly->x1)
+		else if (pOut == (int*)&pPoly->x1)
 			pOut = (int*)&pPoly->x2;
 		else
 			pOut = (int*)&pPoly->x3;

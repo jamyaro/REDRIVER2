@@ -34,7 +34,7 @@ $env:JPEG_DIR = $windows_jpeg_dir
 Set-Location -Path $project_folder
 Rename-Item -Path ($windows_jpeg_dir + '\\jconfig.vc') -NewName "jconfig.h"
 
-& .\\premake5 vs2019
+& .\\premake5 vs2022
 
 # Open solution
-& .\\project_vs2019_windows\\REDRIVER2.sln
+& .\\project_vs2022_windows\\REDRIVER2.sln
