@@ -503,7 +503,7 @@ void PVSDecode(char *output, char *celldata, ushort sz, int havanaCorruptCellBod
 
 	// decode byte-swapped array
 	for (i = 0; i < sz; i++)
-		((ushort*)nybblearray)[i] = M_SHRT_2((unsigned char)celldata[i], (unsigned char)celldata[i] >> 4) & 0xf0f;
+		((ushort*)nybblearray)[i] = M_SHRT_2((u_char)celldata[i], (u_char)celldata[i] >> 4) & 0xf0f;
 
 	pixelIndex = 0;
 	symIndex = 0;
@@ -520,7 +520,7 @@ void PVSDecode(char *output, char *celldata, ushort sz, int havanaCorruptCellBod
 		{
 			symIndex = ni * 2;
 		spod:
-			sym = M_SHRT_2(PVSEncodeTable[symIndex], PVSEncodeTable[symIndex + 1]);
+			sym = M_SHRT_2((u_char)PVSEncodeTable[symIndex], (u_char)PVSEncodeTable[symIndex + 1]);
 		}
 		else
 		{

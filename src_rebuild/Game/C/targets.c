@@ -277,7 +277,7 @@ void DrawStopZone(VECTOR *pPosition)
 {
 	VECTOR* pVector;
 	POLY_FT4* pPoly;
-	long* pOut;
+	int* pOut;
 	SVECTOR temp;
 	long p;
 	long flag;
@@ -297,7 +297,7 @@ void DrawStopZone(VECTOR *pPosition)
 	pVector = pStopZonePt;
 
 	pPoly = (POLY_FT4*)current->primptr;
-	pOut = (long*)&pPoly->x0;
+	pOut = (int*)&pPoly->x0;
 
 	gte_SetRotMatrix(&identity);
 	gte_SetTransVector(&dummy);
@@ -326,12 +326,12 @@ void DrawStopZone(VECTOR *pPosition)
 
 		RotTransPers(&temp, pOut, &p, &flag);
 
-		if (pOut == (long*)&pPoly->x0)
-			pOut = (long*)&pPoly->x1;
+		if (pOut == (int*)&pPoly->x0)
+			pOut = (int*)&pPoly->x1;
 		else if (pOut == (long*)&pPoly->x1)
-			pOut = (long*)&pPoly->x2;
+			pOut = (int*)&pPoly->x2;
 		else
-			pOut = (long*)&pPoly->x3;
+			pOut = (int*)&pPoly->x3;
 
 		pVector++;
 	}
