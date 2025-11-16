@@ -371,7 +371,6 @@ int current_pvs_cell;
 void SetupDrawMapPSX(void)
 {
 	int cell_x, cell_z;
-	int theta;
 	int pvs_cell;
 
 	if (setupYet != 0)

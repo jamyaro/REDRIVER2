@@ -5,13 +5,13 @@
 //----------------------------------------
 
 // makes short out of two bytes
-#define M_SHRT_2(a,b)	(((a) << 8) | (b))
+#define M_SHRT_2(a,b)	(((u_short)(a) << 8) | (u_short)(b))
 
 // makes int out of two shorts
-#define M_INT_2(a,b)	(((a) << 16) | (b))
+#define M_INT_2(a,b)	(((u_int)(a) << 16) | (u_int)(b))
 
 // makes int out of four bytes
-#define M_INT_4(a,b,c,d) (((a) << 24) | ((b) << 16) | ((c) << 8) | (d) )
+#define M_INT_4(a,b,c,d) (((u_int)(a) << 24) | ((u_int)(b) << 16) | ((u_int)(c) << 8) | (u_int)(d) )
 #define M_INT_4R(a,b,c,d) M_INT_4(d, c, b, a)
 
 #define M_BIT(x) (1 << (x))
