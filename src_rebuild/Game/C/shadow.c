@@ -827,13 +827,6 @@ void sQuad(SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, SVECTOR *v3, CVECTOR* light_co
 	else
 #endif
 	{
-		gte_ldv3(v0, v1, v3);
-
-		gte_rtpt();
-
-		setPolyG4(poly);
-		setSemiTrans(poly, 1);
-
 		poly->r1 = light_col->r;
 		poly->g1 = light_col->g;
 		poly->b1 = light_col->b;
@@ -849,17 +842,20 @@ void sQuad(SVECTOR *v0, SVECTOR *v1, SVECTOR *v2, SVECTOR *v3, CVECTOR* light_co
 		poly->r3 = 0;
 		poly->g3 = 0;
 		poly->b3 = 0;
+		
+		gte_ldv3(v0, v1, v3);
+		gte_rtpt();
+
+		setPolyG4(poly);
+		setSemiTrans(poly, 1);
 
 		gte_stsxy3(&poly->x0, &poly->x1, &poly->x2);
-
 		gte_stsz3(&z[0], &z[1], &z[2]);
 
 		gte_ldv0(v2);
-
 		gte_rtps();
 
 		gte_stsxy(&poly->x3);
-
 		gte_stsz(&z[3]);
 		
 		z1 = (z[0] + z[1] + z[2] + z[3] >> 2) + LightSortCorrect;

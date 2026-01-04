@@ -348,14 +348,6 @@ short gRainAlloc[MAX_RAIN_DROPS];
 
 RAIN_TYPE gRain[MAX_RAIN_DROPS];
 
-char PoolPrimData[16] = {
-
-	0x0,  0x8,  0x2,  0x9,
-	0x8,  0x1,  0x9,  0x3,
-	0x4,  0xA,  0x6,  0xB,
-	0xA,  0x5,  0xB,  0x7
-};
-
 int LightSortCorrect = 0;
 
 TEXTURE_DETAILS smoke_texture;
@@ -420,12 +412,11 @@ void PlacePoolForCar(CAR_DATA *cp, CVECTOR *col, int front, int in_car)
 	short brightness;
 	POLY_FT4 *poly;
 	int i;
-	SVECTOR s[27];
-	SVECTOR sout[27];
-	VECTOR s1[12];
+	SVECTOR s[12];
+	SVECTOR s1[12];
 	VECTOR mid_position;
 	VECTOR toss;
-	VECTOR *pos;
+	VECTOR pos;
 	CAR_COSMETICS* car_cos;
 	CVECTOR color;
 	int Z;
@@ -433,7 +424,7 @@ void PlacePoolForCar(CAR_DATA *cp, CVECTOR *col, int front, int in_car)
 	int car_road_height;
 	int count;
 
-	pos = (VECTOR*)cp->hd.where.t;
+	pos = *(VECTOR*)cp->hd.where.t;
 	car_cos = &car_cosmetics[cp->ap.model];
 
 	// [A] there was check that prevented in_car lights in game, but it was working in quick replays...
@@ -469,8 +460,6 @@ void PlacePoolForCar(CAR_DATA *cp, CVECTOR *col, int front, int in_car)
 			s1[11].vz = s1[9].vz;
 
 			LightSortCorrect = -800;
-			
-			sub_level = 3;
 		}
 		else 
 		{
@@ -493,13 +482,14 @@ void PlacePoolForCar(CAR_DATA *cp, CVECTOR *col, int front, int in_car)
 			s1[10].vz = s1[8].vz;
 			s1[11].vz = s1[3].vz;
 
-			sub_level = 3;
-
 			if (player[CurrentPlayerView].cameraView == 2 && cp == &car_data[player[CurrentPlayerView].playerCarId])
 				LightSortCorrect = -320;
 			else
 				LightSortCorrect = -200;
 		}
+
+		sub_level = 3;
+		count = 12;
 	}
 	else
 	{
@@ -513,29 +503,21 @@ void PlacePoolForCar(CAR_DATA *cp, CVECTOR *col, int front, int in_car)
 		s1[1].vz = s1[3].vz + 204;
 
 		sub_level = 0;
+		count = 4;
 	}
 
 	s1[0].vz = s1[1].vz;
 	s1[2].vz = s1[3].vz;
 
 	SetRotMatrix(&cp->hd.drawCarMat);
+	SetVec(&mid_position, 0, 0, -500);
 
-	mid_position.vx = 0;
-	mid_position.vy = 0;
-	mid_position.vz = -500;
-
-	_MatrixRotate(&mid_position);
-
-	mid_position.vx += pos->vx;
-	mid_position.vy += pos->vy;
-	mid_position.vz += pos->vz;
+	gte_ldlv0(&mid_position);
+	gte_rtv0();
+	gte_stlvnl(&mid_position);
+	VecAdd(&mid_position, &mid_position, &pos);
 
 	car_road_height = MapHeight(&mid_position);
-	
-	if (sub_level == 3)
-		count = 12;
-	else
-		count = 4;
 
 	// adjust height and poisition for each vertex
 	for(i = 0; i < count; i++)
@@ -543,122 +525,126 @@ void PlacePoolForCar(CAR_DATA *cp, CVECTOR *col, int front, int in_car)
 		int temp_y;
 
 		s1[i].vy = 0;
-		_MatrixRotate(&s1[i]);
+		gte_ldv0(&s1[i]);
+		gte_rtv0();
+		gte_stlvnl(&toss);
 
-		toss.vx = s1[i].vx + pos->vx;
-		toss.vy = s1[i].vy + pos->vy;
-		toss.vz = s1[i].vz + pos->vz;
-
-		s[i].vx = toss.vx - camera_position.vx;
-		s[i].vz = toss.vz - camera_position.vz;
-
+		VecAdd(&toss, &toss, &pos);
+		toss.vy += 200;
 		temp_y = MapHeight(&toss);
 
 		if (ABS(-temp_y + car_road_height) > 500)
 			s[i].vy = -car_road_height - camera_position.vy;
 		else
 			s[i].vy = -temp_y - camera_position.vy;
+		s[i].vx = toss.vx - camera_position.vx;
+		s[i].vz = toss.vz - camera_position.vz;
 	}
 
 	if (FIXEDH(s[0].vy * s[1].vz - s[0].vz * s[1].vy) * s[2].vx +
 		FIXEDH(s[0].vz * s[1].vx - s[0].vx * s[1].vz) * s[2].vy + 
-		FIXEDH(s[0].vx * s[1].vy - s[0].vy * s[1].vx) * s[2].vz >= 0)
+		FIXEDH(s[0].vx * s[1].vy - s[0].vy * s[1].vx) * s[2].vz < 0)
 	{
-		gte_SetRotMatrix(&inv_camera_matrix);
+		return;
+	}
+
+	gte_SetRotMatrix(&inv_camera_matrix);
+	gte_SetTransVector(&dummy);
+
+	if (sub_level == 0) 
+	{
+		gte_ldv3(&s[0], &s[1], &s[2]);
+		gte_rtpt();
+
+		gte_stszotz(&Z);
+
+		if (Z > 40)
+			Z -= 40;
+
+		if (Z > 49)
+		{
+			poly = (POLY_FT4 *)current->primptr;
+
+			gte_stsxy3(&poly->x0, &poly->x1, &poly->x2);
+
+			// [A] Emit poly only after ot z checked
+			setPolyFT4(poly);
+			setSemiTrans(poly, 1);
+
+			*(ushort*)&poly->u0 = *(ushort*)&light_pool_texture.coords.u0;
+			*(ushort*)&poly->u1 = *(ushort*)&light_pool_texture.coords.u1;
+			*(ushort*)&poly->u2 = *(ushort*)&light_pool_texture.coords.u2;
+			*(ushort*)&poly->u3 = *(ushort*)&light_pool_texture.coords.u3;
+
+			poly->r0 = col->r / 2;
+			poly->g0 = col->g / 2;
+			poly->b0 = col->b / 2;
+			poly->tpage = light_pool_texture.tpageid | 0x20;
+			poly->clut = light_pool_texture.clutid;
+
+			gte_ldv0(&s[3]);
+			gte_rtps();
+			gte_stsxy(&poly->x3);
+
+			addPrim(current->ot + (Z >> 1), poly);
+			current->primptr += sizeof(POLY_FT4);
+		}
+	}
+	else if (sub_level == 3)
+	{
+		for(i = 0; i < 12; i++)
+		{
+			gte_ldv0(&s[i]);
+			gte_rtv0tr();
+			gte_stsv(&s[i]);
+		}
+
+		static char PoolPrimData[16] = {
+			0,  8,  2,  9,
+			8,  1,  9,  3,
+			4,  10, 6,  11,
+			10, 5,  11, 7
+		};
+
+		gte_SetRotMatrix(&identity);
 		gte_SetTransVector(&dummy);
 
-		if (sub_level == 0) 
+		// draw front light quads
+		for(i = 0; i < 4; i++)
 		{
-			gte_ldv3(&s[0], &s[1], &s[2]);
-			gte_rtpt();
+			char* VertIdx;
+			VertIdx = PoolPrimData + i * 4;
 
-			gte_stszotz(&Z);
+			if (i & 2)
+				brightness = LeftLight + LeftLight * 4;
+			else
+				brightness = RightLight + RightLight * 4;
 
-			if (Z > 40)
-				Z -= 40;
-
-			if (Z > 49)
+			if (brightness)
 			{
-				poly = (POLY_FT4 *)current->primptr;
+				color.r = MIN(255, col->r * brightness >> 4);
+				color.g = MIN(255, col->g * brightness >> 4);
+				color.b = MIN(255, col->b * brightness >> 4);
 
-				// [A] Emit poly only after ot z checked
-				setPolyFT4(poly);
-				setSemiTrans(poly, 1);
-
-				*(ushort*)&poly->u0 = *(ushort*)&light_pool_texture.coords.u0;
-				*(ushort*)&poly->u1 = *(ushort*)&light_pool_texture.coords.u1;
-				*(ushort*)&poly->u2 = *(ushort*)&light_pool_texture.coords.u2;
-				*(ushort*)&poly->u3 = *(ushort*)&light_pool_texture.coords.u3;
-
-				poly->r0 = col->r / 2;
-				poly->g0 = col->g / 2;
-				poly->b0 = col->b / 2;
-
-				gte_stsxy3(&poly->x0, &poly->x1, &poly->x2);
-
-				poly->tpage = light_pool_texture.tpageid | 0x20;
-				poly->clut = light_pool_texture.clutid;
-
-				gte_ldv0(&s[3]);
-				gte_rtps();
-				gte_stsxy(&poly->x3);
-
-				addPrim(current->ot + (Z >> 1), poly);
-				current->primptr += sizeof(POLY_FT4);
-			}
-		}
-		else if (sub_level == 3)
-		{
-			for(i = 0; i < 12; i++)
-			{
-				gte_ldv0(&s[i]);
-				gte_rtv0tr();
-				gte_stsv(&sout[i]);
-			}
-
-			// draw front light quads
-			for(i = 0; i < 4; i++)
-			{
-				char* VertIdx;
-				
-				VertIdx = PoolPrimData + i * 4;
-
-				gte_SetRotMatrix(&identity);
-				gte_SetTransVector(&dummy);
-
-				if (i & 2)
-					brightness = LeftLight + LeftLight * 4;
-				else
-					brightness = RightLight + RightLight * 4;
-
-				if (brightness)
+				if (i & 1) 
 				{
-					int test = col->r * brightness;
-
-					color.r = MIN(255, col->r * brightness >> 4);
-					color.g = MIN(255, col->g * brightness >> 4);
-					color.b = MIN(255, col->b * brightness >> 4);
-
-					if (i & 1) 
-					{
-						sQuad(sout + VertIdx[0],
-						      sout + VertIdx[2],
-						      sout + VertIdx[3],
-						      sout + VertIdx[1], &color, LightSortCorrect);
-					}
-					else
-					{
-						sQuad(sout + VertIdx[1],
-						      sout + VertIdx[3],
-						      sout + VertIdx[2],
-						      sout + VertIdx[0], &color, LightSortCorrect);
-					}
+					sQuad(s + VertIdx[0],
+						  s + VertIdx[2],
+						  s + VertIdx[3],
+						  s + VertIdx[1], &color, LightSortCorrect);
+				}
+				else
+				{
+					sQuad(s + VertIdx[1],
+						  s + VertIdx[3],
+						  s + VertIdx[2],
+						  s + VertIdx[0], &color, LightSortCorrect);
 				}
 			}
 		}
-
-		LightSortCorrect = -10;
 	}
+
+	LightSortCorrect = -10;
 }
 
 // [D] [T]
