@@ -78,7 +78,8 @@ workspace "REDRIVER2"
 			("--shell-file " .. WEBSHELL_PATH .. "/shell.html"),
 			("--preload-file " .. WEBDEMO_DIR),
 			("--preload-file " .. RED2_DIR),
-			"-s 'EXPORTED_RUNTIME_METHODS=[\"ccall\", \"writeArrayToMemory\"]'"
+			"-s 'EXPORTED_RUNTIME_METHODS=[\"ccall\", \"writeArrayToMemory\"]'",
+			"-s 'EXPORTED_FUNCTIONS=[\"_main\", \"_malloc\"]'"
 		}
 		
 		filter { "kind:*App" }
