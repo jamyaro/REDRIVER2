@@ -703,6 +703,7 @@ PSXSCREEN* pScreenStack[10] = { 0 };
 PSXBUTTON* pButtonStack[10] = { 0 };
 
 POLY_FT4 BackgroundPolys[6];
+POLY_F4 BackgroundBlack;
 FE_FONT feFont;
 
 RECT16 extraRect = { 896, 256, 64, 219 };
@@ -844,6 +845,7 @@ void SetVariable(int var)
 void SetupBackgroundPolys(void)
 {
 	POLY_FT4 *poly;
+	POLY_F4* bg;
 	int i;
 
 	for (i = 0; i < 6; i++)
@@ -889,6 +891,11 @@ void SetupBackgroundPolys(void)
 	setUVWH(poly, 0, 0, 128, 255);
 	setClut(poly, 960, 256);
 	setTPage(poly, 0, 0, 960, 0);
+
+	bg = &BackgroundBlack;
+	setPolyF4(bg);
+	setXYWH(bg, -1000, 0, 2000, 512);
+	setRGB0(bg, 0, 0, 0);
 }
 
 SPRT HighlightSprt;
@@ -1054,7 +1061,8 @@ void DrawScreen(PSXSCREEN *pScr)
 
 	for (i = 0; i < 6; i++)
 		addPrim(current->ot + 11, &BackgroundPolys[i]);
-
+	addPrim(current->ot + 11, &BackgroundBlack);
+	
 	if (pScr)
 	{
 		GetTimeStamp(version_info);

@@ -25,6 +25,8 @@
 *.code-workspace
 .vscode/*
 .vs/*
+game/*
+webdemo/*
 PSXToolchain/GameSRC*
 PSXToolchain/Overlay*
 PSXToolchain/PsyQ/*

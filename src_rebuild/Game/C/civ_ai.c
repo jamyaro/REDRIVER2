@@ -2224,6 +2224,14 @@ int PingInCivCar(int minPingInDist)
 	if (minPingInDist == 666)
 		model = MAX_CAR_RESIDENT_MODELS - 1;
 
+#if MAX_CAR_RESIDENT_MODELS == 6
+	// [A] fix crashes on missing models
+	if(!gCarCleanModelPtr[model])
+	{
+		return 0;
+	}
+#endif
+
 	// select car color palette
 	if (residentCarModels[model] == 0 || residentCarModels[model] > 4)
 	{

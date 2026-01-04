@@ -2170,7 +2170,7 @@ void StepPathEvent(EVENT* ev)
 		{
 			// [A] preserve direction flag or train will get stuck
 			// i might have been decompiled it wrong but now it works
-			// also preserve collision if it has one (for vegas trains)
+			// also preserve collision flag
 			dir = ev->flags & 0x600;
 			
 			InitTrain(ev, 0, GameLevel == 0 ? 0 : 1);

@@ -13,6 +13,6 @@ extern "C" {
 
 	void EMSCRIPTEN_KEEPALIVE WebLoadCDImage(char* data, int size) 
 	{
-		PsyX_CDFS_Init_Mem((u_long*)data, size, 0, 0);
+		PsyX_CDFS_Init_Mem((u_int*)data, size, 0, 0);
 	}
 }
