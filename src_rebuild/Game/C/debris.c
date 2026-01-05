@@ -409,14 +409,15 @@ MATRIX leaf_mat;
 // [D] [T]
 void PlacePoolForCar(CAR_DATA *cp, CVECTOR *col, int front, int in_car)
 {
+	SVECTOR s[12];
+	SVECTOR s1[12];
+	VECTOR pos;
+	VECTOR toss;
+	SVECTOR smid;
 	short brightness;
 	POLY_FT4 *poly;
 	int i;
-	SVECTOR s[12];
-	SVECTOR s1[12];
-	VECTOR mid_position;
-	VECTOR toss;
-	VECTOR pos;
+
 	CAR_COSMETICS* car_cos;
 	CVECTOR color;
 	int Z;
@@ -510,14 +511,11 @@ void PlacePoolForCar(CAR_DATA *cp, CVECTOR *col, int front, int in_car)
 	s1[2].vz = s1[3].vz;
 
 	SetRotMatrix(&cp->hd.drawCarMat);
-	SetVec(&mid_position, 0, 0, -500);
+	SetVec(&smid, 0, 0, -500);
+	ApplyRotMatrix(&smid, &toss);
+	VecAdd(&toss, &toss, &pos);
 
-	gte_ldlv0(&mid_position);
-	gte_rtv0();
-	gte_stlvnl(&mid_position);
-	VecAdd(&mid_position, &mid_position, &pos);
-
-	car_road_height = MapHeight(&mid_position);
+	car_road_height = MapHeight(&toss);
 
 	// adjust height and poisition for each vertex
 	for(i = 0; i < count; i++)
@@ -525,9 +523,12 @@ void PlacePoolForCar(CAR_DATA *cp, CVECTOR *col, int front, int in_car)
 		int temp_y;
 
 		s1[i].vy = 0;
-		gte_ldv0(&s1[i]);
-		gte_rtv0();
-		gte_stlvnl(&toss);
+
+		// GCC, What the fuck? Optimized version with macros works like shit - lights are 'wiggly' !!!
+		ApplyRotMatrix(&s1[i], &toss);
+		//gte_ldv0(&s1[i]);
+		//gte_rtv0();
+		//gte_stlvnl(&toss);
 
 		VecAdd(&toss, &toss, &pos);
 		toss.vy += 200;
