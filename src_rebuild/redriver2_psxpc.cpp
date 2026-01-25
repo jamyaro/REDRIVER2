@@ -547,8 +547,8 @@ int main(int argc, char** argv)
 
 	int windowWidth = 800;
 	int windowHeight = 600;
-	int screenWidth = 800;
-	int screenHeight = 600;
+	int screenWidth = -1;
+	int screenHeight = -1;
 	int fullScreen = 0;
 	int vsync = 0;
 	int enableFreecamera = 0;
@@ -572,8 +572,10 @@ int main(int argc, char** argv)
 		// configure Psy-X renderer
 		ini_sget(config, "render", "windowWidth", "%d", &windowWidth);
 		ini_sget(config, "render", "windowHeight", "%d", &windowHeight);
+
 		ini_sget(config, "render", "screenWidth", "%d", &screenWidth);
 		ini_sget(config, "render", "screenHeight", "%d", &screenHeight);
+
 		ini_sget(config, "render", "fullscreen", "%d", &fullScreen);
 		ini_sget(config, "render", "vsync", "%d", &g_cfg_swapInterval);
 		ini_sget(config, "render", "pgxpTextureMapping", "%d", &g_cfg_pgxpTextureCorrection);
