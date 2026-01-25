@@ -58,18 +58,43 @@ int CleanSpooledModelSlots()
 void ProcessModel(int modelIdx)
 {
 	MODEL* model;
+	int lit;
 
 	model = modelpointers[modelIdx];
 	model->tri_verts = 0; // [A] this is used as additional flags for animated models and triangle processing
+	lit = 0;
 
 	if (gTimeOfDay == TIME_NIGHT)
 	{
-		if (model->shape_flags & SHAPE_FLAG_SPRITE)
+		if (GameLevel == 0)
 		{
-			if (modelIdx != 1223 && (!(model->flags2 & MODEL_FLAG_TREE) || modelIdx == 945 || modelIdx == 497))
-				litSprites[modelIdx >> 5] |= 1 << (modelIdx & 31);
+			// chicago
+		}
+		else if (GameLevel == 1)
+		{
+			// havana
+			if (model->shape_flags & SHAPE_FLAG_SPRITE)
+				lit = modelIdx != 1223 && !(model->flags2 & MODEL_FLAG_TREE);
+		}
+		else if (GameLevel == 2)
+		{
+			// vegas
+			if (model->shape_flags & SHAPE_FLAG_SPRITE)
+			{
+				if (gMultiplayerLevels)
+					lit = modelIdx == 263 || modelIdx == 275;
+				else
+					lit = modelIdx == 945 || modelIdx == 497;
+			}
+		}
+		else if (GameLevel == 3)
+		{
+			// rio
 		}
 	}
+
+	if(lit)
+		litSprites[modelIdx >> 5] |= 1 << (modelIdx & 31);
 }
 
 // [D] [T]
