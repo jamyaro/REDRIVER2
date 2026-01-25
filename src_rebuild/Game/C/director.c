@@ -141,7 +141,7 @@ void InitDirectorVariables(void)
 	DirectorMenuActive = 1;
 	ClearCameras = 0;
 	EditMode = 0;
-	AutoDirect = 0;
+	AutoDirect = (WantedGameMode == GAMEMODE_REPLAY);
 	CursorX = 0;
 
 	gCameraOffset.vx = 0;
