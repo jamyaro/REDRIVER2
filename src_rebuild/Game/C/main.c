@@ -1425,7 +1425,7 @@ void StepGame(void)
 		else if(quick_replay && !paused)
 		{
 			WantPause = 1;
-			PauseMode = PAUSEMODE_GAMEOVER;
+			PauseMode = (PauseMode == PAUSEMODE_COMPLETE) ? PauseMode : PAUSEMODE_GAMEOVER;
 		}
 
 		paused = 1;
@@ -1657,7 +1657,7 @@ void EnablePause(PAUSEMODE mode)
 	if (!pauseflag)
 	{
 		WantPause = 1;
-		PauseMode = mode;
+		PauseMode = (PauseMode == PAUSEMODE_COMPLETE) ? PauseMode : mode;
 	}
 }
 
