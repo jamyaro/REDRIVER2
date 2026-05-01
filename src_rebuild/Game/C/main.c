@@ -493,7 +493,7 @@ void State_GameInit(void* param)
 	LoadMission(gCurrentMissionNumber);
 
 	if (gCurrentMissionNumber == 38)
-		MissionHeader->residentModels[4] = 9;
+		residentCarModels[MAX_CAR_RESIDENT_MODELS - 1] = 9;
 
 	if (GameType == GAME_MISSION)
 		SetupFadePolys();
@@ -892,7 +892,7 @@ void StepSim(void)
 		}
 		else
 		{
-			if (copsAreInPursuit != 0 && MissionHeader->residentModels[3] == 0 && gCurrentMissionNumber != 26)
+			if (copsAreInPursuit != 0 && residentCarModels[3] == 0 && gCurrentMissionNumber != 26)
 				requestRoadblock = 1;
 
 			if (roadblockCount != 0)
@@ -1425,7 +1425,7 @@ void StepGame(void)
 		else if(quick_replay && !paused)
 		{
 			WantPause = 1;
-			PauseMode = PAUSEMODE_GAMEOVER;
+			PauseMode = (PAUSEMODE)gMissionCompletionState;
 		}
 
 		paused = 1;
@@ -2294,9 +2294,9 @@ void RenderGame2(int view)
 
 	for (i = 0; i < 2; i++)
 	{
-		if (player[i].playerCarId >= 0 &&
-			CarHasSiren(car_data[player[i].playerCarId].ap.model) != 0 &&
-			player[i].horn.on != 0)
+		if (player[i].playerCarId >= 0 && 
+			player[i].horn.on != 0 &&
+			CarHasSiren(car_data[player[i].playerCarId].ap.model) != 0)
 		{
 			AddCopCarLight(&car_data[player[i].playerCarId]);
 		}
@@ -2484,7 +2484,7 @@ void InitGameVariables(void)
 void DealWithHorn(char* hr, int i)
 {
 	int channel;
-	int modelId;
+	int sample;
 	CAR_DATA* car;
 
 	car = &car_data[player[i].playerCarId];
@@ -2499,16 +2499,10 @@ void DealWithHorn(char* hr, int i)
 	}
 	else if (*hr == 2)
 	{
-		if (car->ap.model == 4)
-			modelId = ResidentModelsBodge();
-		else if (car->ap.model < 3)
-			modelId = car->ap.model;
-		else
-			modelId = car->ap.model - 1;
-
+		sample = GetCarBankSample(car->ap.model);
 		channel = i != 0 ? 5 : 2;
 
-		Start3DSoundVolPitch(channel, SOUND_BANK_CARS, modelId * 3 + 2,
+		Start3DSoundVolPitch(channel, SOUND_BANK_CARS, sample * 3 + 2,
 			car->hd.where.t[0],
 			car->hd.where.t[1],
 			car->hd.where.t[2], -10000,

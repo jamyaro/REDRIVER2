@@ -148,6 +148,7 @@ STOPCOPS gStopCops;
 
 MS_MISSION* MissionLoadAddress;
 MS_MISSION* MissionHeader;
+int residentCarModels[MAX_CAR_RESIDENT_MODELS];
 STREAM_SOURCE* PlayerStartInfo[8];
 int numPlayersToCreate = 0;
 int gStartOnFoot = 0;
@@ -324,7 +325,29 @@ void InitialiseMissionDefaults(void)
 void SetupResidentModels()
 {
 	int i, j;
-	int takenSlots = 0;
+	int takenSlots;
+
+
+	takenSlots = 0;
+	for (i = 0; i < 5; ++i)
+	{
+		residentCarModels[i] = MissionHeader->residentModels[i];
+		takenSlots |= 1 << MissionHeader->residentModels[i];
+	}
+#if MAX_CAR_RESIDENT_MODELS > 5
+	for (i = 1; i < 5; ++i)
+	{
+		if ((takenSlots & (1 << i)) == 0)
+		{
+			residentCarModels[4] = i;
+			break;
+		}
+	}
+	if (residentCarModels[3] != 0 && gCurrentMissionNumber != 33)
+		residentCarModels[4] = residentCarModels[3];
+
+	residentCarModels[MAX_CAR_RESIDENT_MODELS - 1] = MissionHeader->residentModels[4];
+#endif // MAX_CAR_RESIDENT_MODELS > 5
 
 	// check if start data is required
 	if (MissionHeader->type & 1)
@@ -332,10 +355,11 @@ void SetupResidentModels()
 		// check if start data is required
 		RestoreStartData();
 
-		if (PlayerStartInfo[0]->model > 4)
-			MissionHeader->residentModels[4] = PlayerStartInfo[0]->model;
+		if (PlayerStartInfo[0]->model > 5)
+			residentCarModels[MAX_CAR_RESIDENT_MODELS - 1] = PlayerStartInfo[0]->model;
 	}
 
+	takenSlots = 0;
 	for(i = 0; i < 2; i++)
 	{
 		if (wantedCar[i] != -1)
@@ -343,9 +367,9 @@ void SetupResidentModels()
 			int foundRM = -1;
 			int singlePal;
 			
-			for (j = 0; j < 5; j++)
+			for (j = 0; j < MAX_CAR_RESIDENT_MODELS; j++)
 			{
-				if (MissionHeader->residentModels[j] == wantedCar[i])
+				if (residentCarModels[j] == wantedCar[i])
 				{
 					foundRM = j;
 					break;
@@ -357,13 +381,13 @@ void SetupResidentModels()
 			singlePal = (wantedCar[i] == 0 || wantedCar[i] > 4);
 			
 			// check if chosen cop car or special car
-			if (wantedCar[i] > 4)// && NumPlayers == 1)
+			if (wantedCar[i] > 5)// && NumPlayers == 1)
 			{		
-				MissionHeader->residentModels[4] = wantedCar[i];
+				residentCarModels[MAX_CAR_RESIDENT_MODELS - 1] = wantedCar[i];
 			}
 			else if(foundRM == -1)
 			{
-				MissionHeader->residentModels[takenSlots++] = wantedCar[i];
+				residentCarModels[takenSlots++] = wantedCar[i];
 			}
 			else
 			{

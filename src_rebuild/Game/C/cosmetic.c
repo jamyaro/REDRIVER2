@@ -17,12 +17,12 @@ char* CosmeticFiles[] = {
 	"LEVELS\\RIO.LCF",
 };
 
-CAR_COSMETICS car_cosmetics[MAX_CAR_MODELS];
+CAR_COSMETICS car_cosmetics[MAX_CAR_RESIDENT_MODELS];
 
 #if ENABLE_GAME_FIXES
 // [A] storage for spooled models
 // remember: we already have more than 1k of free memory with optimizations
-CAR_COSMETICS levelSpecCosmetics[5];
+CAR_COSMETICS levelSpecCosmetics[MAX_CAR_RESIDENT_MODELS];
 #endif
 
 #if USE_PC_FILESYSTEM
@@ -50,13 +50,13 @@ void ProcessCosmeticsLump(char *lump_ptr, int lump_size)
 	int i;
 	int offset;
 
-	for (i = 0; i < MAX_CAR_MODELS; i++)
+	for (i = 0; i < MAX_CAR_RESIDENT_MODELS; i++)
 	{
-		model = MissionHeader->residentModels[i];
+		model = residentCarModels[i];
 
 		if (model == 13)
 		{
-			model = 10 - (MissionHeader->residentModels[0] + MissionHeader->residentModels[1] + MissionHeader->residentModels[2]);
+			model = 10 - (residentCarModels[0] + residentCarModels[1] + residentCarModels[2]);
 
 			if (model < 1) 
 				model = 1;
@@ -79,7 +79,7 @@ void ProcessCosmeticsLump(char *lump_ptr, int lump_size)
 
 	// [A] cache all special vehicle cosmetics
 #if ENABLE_GAME_FIXES
-	for (i = 0; i < MAX_CAR_MODELS; i++)
+	for (i = 0; i < 5; i++)
 	{
 		model = 8 + i;
 
@@ -137,22 +137,22 @@ void AddReverseLight(CAR_DATA *cp)
 void SetupSpecCosmetics(char *loadbuffer)
 {
 	int model;
-	model = MissionHeader->residentModels[4];
+	model = residentCarModels[MAX_CAR_RESIDENT_MODELS - 1];
 
 #if ENABLE_GAME_FIXES
 	// [A] always use cached cosmetics
-	car_cosmetics[4] = levelSpecCosmetics[model - 8];
+	car_cosmetics[MAX_CAR_RESIDENT_MODELS - 1] = levelSpecCosmetics[model - 8];
 #else
-	car_cosmetics[4] = *(CAR_COSMETICS*)loadbuffer;
+	car_cosmetics[MAX_CAR_RESIDENT_MODELS - 1] = *(CAR_COSMETICS*)loadbuffer;
 #endif
 
 #if USE_PC_FILESYSTEM
 	if (gContentOverride)
-		LoadCustomCarCosmetics(&car_cosmetics[4], model);
+		LoadCustomCarCosmetics(&car_cosmetics[MAX_CAR_RESIDENT_MODELS - 1], model);
 #endif
 
 	// [A] don't forget
-	FixCarCos(&car_cosmetics[4], model);
+	FixCarCos(&car_cosmetics[MAX_CAR_RESIDENT_MODELS - 1], model);
 }
 
 // [D] [T]
@@ -173,12 +173,11 @@ void AddIndicatorLight(CAR_DATA *cp, int Type)
 	life2 = &cp->ap.life2;
 
 	if (cp->ap.life < 0)
-		brightness = (0xff - (u_int)cp->ap.life) * 2;
+		brightness = (255 - (u_int)cp->ap.life) * 2 & 255;
 	else
-		brightness = cp->ap.life << 1;
+		brightness = cp->ap.life << 1 & 255;
 
-	col.r = brightness & 0xFF;
-
+	col.r = brightness;
 	col.g = 0;
 	col.b = 0;
 

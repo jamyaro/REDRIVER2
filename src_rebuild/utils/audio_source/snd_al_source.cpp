@@ -32,10 +32,10 @@ void CSoundSource_OpenALCache::InitWav(CSoundSource_WaveCache* wav)
 	if (loopStart > 0)
 	{
 		int loopEnd = wav->m_loopEnd;
-
+#ifdef AL_SAMPLE_LENGTH_SOFT
 		if (loopEnd == -1)
 			alGetBufferi(m_alBuffer, AL_SAMPLE_LENGTH_SOFT, &loopEnd); // loop to the end
-
+#endif
 		int sampleOffs[] = { loopStart, loopEnd };
 		alBufferiv(m_alBuffer, AL_LOOP_POINTS_SOFT, sampleOffs);
 	}

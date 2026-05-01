@@ -1856,7 +1856,7 @@ void TannerShadow(LPPEDESTRIAN pDrawingPed, VECTOR* pPedPos, SVECTOR* pLightPos,
 
 	for (i = 0; i < 4; i++)
 	{
-		cn = rcos(Tangle); sn = rsin(Tangle);
+		cn = RCOS(Tangle); sn = RSIN(Tangle);
 
 		vx = vert[i].vx; vz = vert[i].vz;
 

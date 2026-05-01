@@ -1250,10 +1250,7 @@ void SetUpEvents(int full)
 		evt = event;
 
 		// in Beat the train we spawn more train cars
-		if (gCurrentMissionNumber == 22)
-			cCarriages = 9;
-		else
-			cCarriages = 2;
+		cCarriages = (gCurrentMissionNumber == 22) ? 9 : 2;
 
 		for (i = 0; i < cCarriages; i++)
 		{
@@ -2173,12 +2170,12 @@ void StepPathEvent(EVENT* ev)
 		{
 			// [A] preserve direction flag or train will get stuck
 			// i might have been decompiled it wrong but now it works
-			dir = ev->flags & 0x400;
+			// also preserve collision flag
+			dir = ev->flags & 0x600;
 			
 			InitTrain(ev, 0, GameLevel == 0 ? 0 : 1);
 
-			if (dir)
-				ev->flags |= 0x400;
+			ev->flags |= dir;
 		}
 		else if (ev->flags & 0x400)
 		{
@@ -3645,7 +3642,7 @@ VECTOR* TriggerEvent(int i)
 					break;
 				case 8:
 					// open gate to secret car
-					PingOutAllSpecialCivCars();
+					PrepareSecretCar();
 				
 					TriggerDoor(&rioDoor[4], &stage[i], 0);
 					TriggerDoor(&rioDoor[5], &stage[i], 0);

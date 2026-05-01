@@ -49,9 +49,9 @@ char* DentingFiles[] =
 #define MAX_FILE_DAMAGE_ZONE_POLYS	70
 #define MAX_FILE_DAMAGE_LEVELS		256
 
-u_char gCarDamageZoneVerts[MAX_CAR_MODELS][NUM_DAMAGE_ZONES][MAX_DAMAGE_ZONE_VERTS];
-u_char gHDCarDamageZonePolys[MAX_CAR_MODELS][NUM_DAMAGE_ZONES][MAX_DAMAGE_ZONE_POLYS];
-u_char gHDCarDamageLevels[MAX_CAR_MODELS][MAX_DAMAGE_LEVELS];	// the damage level (texture) count for polygons
+u_char gCarDamageZoneVerts[MAX_CAR_RESIDENT_MODELS][NUM_DAMAGE_ZONES][MAX_DAMAGE_ZONE_VERTS];
+u_char gHDCarDamageZonePolys[MAX_CAR_RESIDENT_MODELS][NUM_DAMAGE_ZONES][MAX_DAMAGE_ZONE_POLYS];
+u_char gHDCarDamageLevels[MAX_CAR_RESIDENT_MODELS][MAX_DAMAGE_LEVELS];	// the damage level (texture) count for polygons
 
 // [D] [T]
 void InitialiseDenting(void)
@@ -387,7 +387,7 @@ void MoveHubcap()
 
 		if (gTimeOfDay == TIME_NIGHT)
 		{
-			cmb = (combointensity & 0xffU) / 3;
+			cmb = (combointensity & 255) / 3;
 			combointensity = cmb << 0x10 | cmb << 8 | cmb;
 		}
 
@@ -408,13 +408,13 @@ void ProcessDentLump(char *lump_ptr, int lump_size)
 	int offset;
 	u_char* mem;
 
-	for (i = 0; i < MAX_CAR_MODELS; i++)
+	for (i = 0; i < MAX_CAR_RESIDENT_MODELS; i++)
 	{
-		model = MissionHeader->residentModels[i];
+		model = residentCarModels[i];
 
 		if (model == 13)
 		{
-			model = 10 - (MissionHeader->residentModels[0] + MissionHeader->residentModels[1] + MissionHeader->residentModels[2]);
+			model = 10 - (residentCarModels[0] + residentCarModels[1] + residentCarModels[2]);
 
 			if (model < 1) 
 				model = 1;
@@ -461,7 +461,7 @@ void SetupSpecDenting(char *loadbuffer)
 	{
 		char* newDenting;
 		int model;
-		model = MissionHeader->residentModels[4];
+		model = residentCarModels[MAX_CAR_RESIDENT_MODELS - 1];
 
 		newDenting = LoadCustomCarDentingFromFile(NULL, model);
 		if (newDenting)
@@ -471,13 +471,13 @@ void SetupSpecDenting(char *loadbuffer)
 #endif
 
 	// [A] this is better
-	memcpy((u_char*)gCarDamageZoneVerts[4], (u_char*)loadbuffer, NUM_DAMAGE_ZONES * MAX_FILE_DAMAGE_ZONE_VERTS);
+	memcpy((u_char*)gCarDamageZoneVerts[MAX_CAR_RESIDENT_MODELS - 1], (u_char*)loadbuffer, NUM_DAMAGE_ZONES * MAX_FILE_DAMAGE_ZONE_VERTS);
 	offset = NUM_DAMAGE_ZONES * MAX_FILE_DAMAGE_ZONE_VERTS;
 
-	memcpy((u_char*)gHDCarDamageZonePolys[4], (u_char*)loadbuffer + offset, NUM_DAMAGE_ZONES * MAX_FILE_DAMAGE_ZONE_POLYS);
+	memcpy((u_char*)gHDCarDamageZonePolys[MAX_CAR_RESIDENT_MODELS - 1], (u_char*)loadbuffer + offset, NUM_DAMAGE_ZONES * MAX_FILE_DAMAGE_ZONE_POLYS);
 	offset += NUM_DAMAGE_ZONES * MAX_FILE_DAMAGE_ZONE_POLYS;
 
-	memcpy((u_char*)gHDCarDamageLevels[4], (u_char*)loadbuffer + offset, MAX_FILE_DAMAGE_LEVELS);
+	memcpy((u_char*)gHDCarDamageLevels[MAX_CAR_RESIDENT_MODELS - 1], (u_char*)loadbuffer + offset, MAX_FILE_DAMAGE_LEVELS);
 }
 
 // [D] [T]

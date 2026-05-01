@@ -10,7 +10,7 @@ set SDL2_DIR=%windows_sdl2_dir%
 
 premake5 vs2019
 
-cd project_vs2019_windows
+cd build
 
 set config=Debug:Release:Release_dev
 for %%c in (%config::= %) do (

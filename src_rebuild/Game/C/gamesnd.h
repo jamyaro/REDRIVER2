@@ -82,7 +82,7 @@ extern SPEECH_QUEUE gSpeechQueue;
 extern void LoadBankFromLump(int bank, int lump); // 0x00052460
 
 extern int CarHasSiren(int index); // 0x000522EC
-extern int ResidentModelsBodge(); // 0x0004D690
+extern int GetCarBankSample(int model); // 0x0004D690
 
 extern void LoadLevelSFX(int missionNum); // 0x0004D784
 

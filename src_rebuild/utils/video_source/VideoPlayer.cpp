@@ -314,18 +314,16 @@ struct SUBTITLE
 SUBTITLE g_Subtitles[128];
 int g_NumSubtitles = 0;
 
-void InitSubtitles(const char* filename)
+void InitSubtitles(char* filename)
 {
 	g_NumSubtitles = 0;
-	FILE* subFile = fopen(filename, "rb");
-	if (subFile)
-	{
-		fread(&g_NumSubtitles, sizeof(int), 1, subFile);
 
-		fread(g_Subtitles, sizeof(SUBTITLE), g_NumSubtitles, subFile);
+	if(!FileExists(filename))
+		return;
 
-		fclose(subFile);
-	}
+	Loadfile(filename, (char*)_other_buffer);
+	g_NumSubtitles = *(int*)_other_buffer;
+	memcpy(g_Subtitles, (char*)_other_buffer + sizeof(int), sizeof(SUBTITLE) * g_NumSubtitles);
 }
 
 char* g_CreditsBuffer = NULL;
@@ -490,9 +488,7 @@ void DoPlayFMV(RENDER_ARG* arg, int subtitles)
 	// also load subtitle file
 	if (subtitles)
 	{
-		sprintf(filename, "%sFMV\\%d\\RENDER%d.SBN", gDataFolder, fd, arg->render);
-		FS_FixPathSlashes(filename);
-	
+		sprintf(filename, "FMV\\%d\\RENDER%d.SBN", fd, arg->render);	
 		InitSubtitles(filename);
 	}
 	else

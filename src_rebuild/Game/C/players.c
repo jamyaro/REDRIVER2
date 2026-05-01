@@ -20,30 +20,27 @@ PLAYER player[MAX_PLAYERS];
 void InitPlayer(PLAYER *locPlayer, CAR_DATA *cp, char carCtrlType, int direction, LONGVECTOR4* startPos, int externModel, int palette, char *padid)
 {
 	int playerId;
-	int model;
+	int model, i;
 	u_int playerType;
 
-	playerType = externModel & 0xFF;
+	playerType = externModel & 255;
 	ClearMem((char *)locPlayer, sizeof(PLAYER));
 
 	playerId = locPlayer - player;
 
 	if (gStartOnFoot == 0 || carCtrlType == CONTROL_TYPE_LEAD_AI)
 	{
-		model = 0xFF;
+		model = -1;
+		for (i = 0; i < MAX_CAR_RESIDENT_MODELS; ++i)
+		{
+			if (residentCarModels[i] == playerType)
+			{
+				model = i;
+				break;
+			}
+		}
 
-		if (MissionHeader->residentModels[0] == playerType) 
-			model = 0;
-		else if(MissionHeader->residentModels[1] == playerType)
-			model = 1;
-		else if (MissionHeader->residentModels[2] == playerType)
-			model = 2;
-		else if (MissionHeader->residentModels[3] == playerType)
-			model = 3;
-		else if (MissionHeader->residentModels[4] == playerType)
-			model = 4;
-
-		InitCar(cp, direction, startPos, carCtrlType, model, palette & 0xff, &locPlayer->padid);
+		InitCar(cp, direction, startPos, carCtrlType, model, palette & 255, &locPlayer->padid);
 
 		ResetTyreTracks(cp, playerId);
 
@@ -215,7 +212,7 @@ void ChangePedPlayerToCar(int playerID, CAR_DATA *newCar)
 #endif
 		)
 		{
-			if (gCurrentMissionNumber != 32 && MissionHeader->residentModels[newCar->ap.model] == 0)
+			if (gCurrentMissionNumber != 32 && residentCarModels[newCar->ap.model] == 0)
 			{
 				NoteFelony(&felonyData, 11, 4096);
 			}

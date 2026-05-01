@@ -943,7 +943,7 @@ void ControlCopDetection(void)
 
 	if (player_position_known == 1 && first_offence == 0) 
 	{
-		heading = GetCarDirectionOfTravel(&car_data[player[0].playerCarId]);
+		heading = GetPlayerDirectionOfTravel(&player[0]);
 
 		CopSay(Random2(2) % 2 + 10, heading);
 
@@ -961,7 +961,7 @@ void ControlCopDetection(void)
 		int rnd;
 		rnd = Random2(2);
 
-		heading = GetCarDirectionOfTravel(&car_data[player[0].playerCarId]);
+		heading = GetPlayerDirectionOfTravel(&player[0]);
 
 		if ((rnd == (rnd / 5) * 5) && (dx != LastHeading))
 			CopSay(rnd % 2 + 10, heading);

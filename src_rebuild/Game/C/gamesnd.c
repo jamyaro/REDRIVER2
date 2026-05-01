@@ -154,10 +154,17 @@ void LoadBankFromLump(int bank, int lump)
 		LoadfileSeg(name, (char*)blockLimit, 0, sizeof(blockLimit));
 
 	size = blockLimit[lump + 1] - blockLimit[lump];
+	if(size <= 0)
+	{
+		printWarning("WARNING: sound bank lump %d is not valid!\n", lump);
+		return;
+	}
+	
 	LoadfileSeg(name, (char*)_sbank_buffer, blockLimit[lump], size);
-
 	if (size > 0 && blockLimit[lump] && blockLimit[lump + 1]) // [A]
+	{
 		LoadSoundBankDynamic((char*)_sbank_buffer, size, bank);
+	}
 	else
 		printWarning("WARNING: sound bank lump %d is not valid!\n", lump);
 }
@@ -165,26 +172,26 @@ void LoadBankFromLump(int bank, int lump)
 // [D] [T]
 int CarHasSiren(int index)
 {
-	if (index == 4)
+	if (index == MAX_CAR_RESIDENT_MODELS - 1)
 	{
 		if (GameLevel == 0)
 		{
-			if (MissionHeader->residentModels[4] == 8)
+			if (residentCarModels[MAX_CAR_RESIDENT_MODELS - 1] == 8)
 				return M_SHRT_2(SOUND_BANK_SFX, 12);
 		}
 		else if (GameLevel == 2)
 		{
-			if (MissionHeader->residentModels[4] == 9)
+			if (residentCarModels[MAX_CAR_RESIDENT_MODELS - 1] == 9)
 				return M_SHRT_2(SOUND_BANK_SFX, 12);
 		}
 		else if (GameLevel == 3)
 		{
-			if (MissionHeader->residentModels[4] == 10)
+			if (residentCarModels[MAX_CAR_RESIDENT_MODELS - 1] == 10)
 				return M_SHRT_2(SOUND_BANK_SFX, 12);
 		}
 	}
 
-	return M_SHRT_2((MissionHeader->residentModels[index] == 0) ? SOUND_BANK_VOICES : 0, 0);
+	return M_SHRT_2((residentCarModels[index] == 0) ? SOUND_BANK_VOICES : 0, 0);
 }
 
 // [D] [T]
@@ -206,7 +213,7 @@ int ResidentModelsBodge(void)
 	int i;
 	int j;
 
-	if (gCurrentMissionNumber == 24 || 
+	if (gCurrentMissionNumber == 24 ||
 		gCurrentMissionNumber == 27 ||
 		gCurrentMissionNumber == 29 ||
 		gCurrentMissionNumber == 30 ||
@@ -215,7 +222,7 @@ int ResidentModelsBodge(void)
 		return 3;
 	}
 
-	j = MissionHeader->residentModels[4];
+	j = residentCarModels[MAX_CAR_RESIDENT_MODELS - 1];
 
 	if (gCurrentMissionNumber - 50U < 16 && j == 12)
 	{
@@ -229,9 +236,9 @@ int ResidentModelsBodge(void)
 		if (j != 9 && j != i)
 			return 3;
 	}
-	else if (GameLevel == 1) 
+	else if (GameLevel == 1)
 	{
-		if (j - 8U > 1) 
+		if (j - 8U > 1)
 			return 3;
 	}
 	else if (GameLevel == 2)
@@ -254,6 +261,25 @@ int ResidentModelsBodge(void)
 	return 4;
 }
 
+// [A]
+int GetCarBankSample(int model)
+{
+	int bankStartSample;
+	if (model == MAX_CAR_RESIDENT_MODELS - 1)
+	{
+#if MAX_CAR_RESIDENT_MODELS > 5
+		bankStartSample = ResidentModelsBodge() + 1;
+#else
+		bankStartSample = ResidentModelsBodge();
+#endif
+	}
+	else if (model < 3)
+		bankStartSample = model;
+	else
+		bankStartSample = model - 1;
+	return bankStartSample;
+}
+
 // [D] [T]
 int MapCarIndexToBank(int index)
 {
@@ -269,19 +295,19 @@ int MapCarIndexToBank(int index)
 	int model;
 	int ret;
 
-	RM = MissionHeader->residentModels;
+	RM = residentCarModels;
 
 	model = RM[index];
 
-	if (gCurrentMissionNumber - 39U < 2 && RM[index] == 13)
+	if (gCurrentMissionNumber == 40 && RM[index] == 13)
 	{
 		model = 10 - (RM[0] + RM[1] + RM[2]);
 
 		if (model < 1)
 			model = 1;
 
-		if (model > 4)
-			model = 4;
+		if (model > 5)
+			model = 5;
 	}
 
 	ret = model - 1;
@@ -316,6 +342,9 @@ void LoadLevelSFX(int missionNum)
 	// load car banks
 	for (i = 0; i < 3; i++)
 		LoadBankFromLump(SOUND_BANK_CARS, MapCarIndexToBank(i));
+#if MAX_CAR_RESIDENT_MODELS > 5
+	LoadBankFromLump(SOUND_BANK_CARS, MapCarIndexToBank(4));
+#endif
 
 	ShowLoading();
 
@@ -475,8 +504,8 @@ void LoadLevelSFX(int missionNum)
 	LoadSoundBankDynamic(NULL, 3, SOUND_BANK_CARS);
 
 	// special vehicle 1 bank
-	if (missionNum - 39U < 2 || missionNum >= 400 && missionNum <= 404)
-		LoadBankFromLump(SOUND_BANK_CARS, MapCarIndexToBank(4));
+	if (missionNum == 40 || missionNum >= 400 && missionNum <= 404)
+		LoadBankFromLump(SOUND_BANK_CARS, MapCarIndexToBank(MAX_CAR_RESIDENT_MODELS-1));
 	else
 		LoadBankFromLump(SOUND_BANK_CARS, SpecialVehicleKludge(0));
 
@@ -505,7 +534,7 @@ void LoadLevelSFX(int missionNum)
 
 		for (i = 0; i < 3; i++)
 		{
-			if (MissionHeader->residentModels[i] == MissionHeader->residentModels[3])
+			if (residentCarModels[i] == residentCarModels[3])
 				cop_model = i;
 		}
 	}
@@ -524,13 +553,7 @@ void StartPlayerCarSounds(int playerId, int model, VECTOR* pos)
 	int channel;
 	int siren;
 
-	if (model == 4)
-		carSampleId = ResidentModelsBodge();
-	else if (model < 3)
-		carSampleId = model;
-	else
-		carSampleId = model - 1;
-
+	carSampleId = GetCarBankSample(model);
 	siren = CarHasSiren(model);
 
 	// rev sound
@@ -1197,7 +1220,7 @@ void DoDopplerSFX(void)
 			car = indexlist[i];
 			for (j = 0; j < MAX_CAR_NOISES; j++)
 			{
-				int bank, model;
+				int bankStart, model;
 
 				if (car_noise[j].in_use)
 					continue;
@@ -1218,17 +1241,12 @@ void DoDopplerSFX(void)
 					model = cop_model;
 
 				// get bank id
-				if (model == 4)
-					bank = ResidentModelsBodge();
-				else if (model < 3)
-					bank = model;
-				else
-					bank = model - 1;
+				bankStart = GetCarBankSample(model);
 
 				if (car_noise[j].idle)
-					sample = bank * 3 + 1;
+					sample = bankStart * 3 + 1;
 				else
-					sample = bank * 3;
+					sample = bankStart * 3;
 
 				car_noise[j].chan = Start3DTrackingSound(-1, SOUND_BANK_CARS, sample, 
 					(VECTOR*)car_data[car].hd.where.t, 
@@ -1263,7 +1281,7 @@ void DoDopplerSFX(void)
 		// restart sound if it's changed
 		if (old_idle != car_noise[j].idle)
 		{
-			int bank, model;
+			int bankStart, model;
 
 			StopChannel(car_noise[j].chan);
 			UnlockChannel(car_noise[j].chan);
@@ -1274,17 +1292,12 @@ void DoDopplerSFX(void)
 				model = cop_model;
 
 			// get bank id
-			if (model == 4)
-				bank = ResidentModelsBodge();
-			else if (model < 3)
-				bank = model;
-			else
-				bank = model - 1;
+			bankStart = GetCarBankSample(model);
 
 			if (car_noise[j].idle)
-				sample = bank * 3 + 1;
+				sample = bankStart * 3 + 1;
 			else
-				sample = bank * 3;
+				sample = bankStart * 3;
 
 			car_noise[j].chan = Start3DTrackingSound(-1, SOUND_BANK_CARS, sample, (VECTOR*)cp->hd.where.t, (LONGVECTOR3*)cp->st.n.linearVelocity);
 			
@@ -2569,12 +2582,7 @@ void LeadHorn(CAR_DATA* cp)
 
 	if (horn_time == rnd)
 	{
-		if (cp->ap.model == 4)
-			carBank = ResidentModelsBodge();
-		else if (cp->ap.model < 3)
-			carBank = cp->ap.model;
-		else
-			carBank = cp->ap.model - 1;
+		carBank = GetCarBankSample(cp->ap.model);
 
 		Start3DTrackingSound(-1, SOUND_BANK_CARS, carBank * 3 + 2, 
 			(VECTOR*)cp->hd.where.t, 

@@ -2,6 +2,7 @@
 
 require "premake_modules/usage"
 require "premake_modules/emscripten"
+require "premake_modules/vscode"
 
 IS_ANDROID = (_ACTION == "androidndk")
 
@@ -21,7 +22,7 @@ SDL2_DIR = os.getenv("SDL2_DIR") or "dependencies/SDL2"
 OPENAL_DIR = os.getenv("OPENAL_DIR") or "dependencies/openal-soft"
 JPEG_DIR = os.getenv("JPEG_DIR") or "dependencies/jpeg"
 
-WEBDEMO_DIR = os.getenv("WEBDEMO_DIR") or "../../../../content/web_demo@/"	-- FIXME: make it better
+WEBDEMO_DIR = os.getenv("WEBDEMO_DIR") or "../../web_demo@/"	-- FIXME: make it better
 RED2_DIR = os.getenv("RED2_DIR") or "../../data@/"
 WEBSHELL_PATH = "../platform/Emscripten"	-- must be relative to makefile path (SADLY)
 
@@ -35,7 +36,15 @@ end
 ------------------------------------------
 	
 workspace "REDRIVER2"
-    location "project_%{_ACTION}_%{os.target()}"
+	if _ACTION ~= "vscode" then
+    	location "build"
+	else
+		-- setup VSCode generator settings
+		vscode_makefile "build"
+		vscode_launch_cwd ("${workspaceRoot}/../data")
+		--vscode_launch_environment {	}
+	end
+
     configurations { "Debug", "Release", "Release_dev" }
 	
     defines { VERSION } 
@@ -43,14 +52,10 @@ workspace "REDRIVER2"
 	if os.target() == "emscripten" then
 		platforms { "emscripten" }
 	
-		buildoptions { 
-			"-s TOTAL_MEMORY=1073741824",
+		buildoptions {
 			"-s USE_SDL=2",
-			"-s FULL_ES2=1",
+			"-s USE_LIBJPEG=1",
 			--"-s USE_WEBGL2=1",
-			"-s ASYNCIFY=1",
-			"-s ALLOW_MEMORY_GROWTH=1",
-			"-s GL_TESTING=1",
 			"-Wno-c++11-narrowing",
 			"-Wno-constant-conversion",
 			"-Wno-writable-strings",
@@ -64,6 +69,7 @@ workspace "REDRIVER2"
 		linkoptions  { 
 			"-s TOTAL_MEMORY=1073741824",
 			"-s USE_SDL=2",
+			"-s USE_LIBJPEG=1",
 			"-s FULL_ES2=1",
 			--"-s USE_WEBGL2=1",
 			"-s ASYNCIFY=1",
@@ -72,7 +78,8 @@ workspace "REDRIVER2"
 			("--shell-file " .. WEBSHELL_PATH .. "/shell.html"),
 			("--preload-file " .. WEBDEMO_DIR),
 			("--preload-file " .. RED2_DIR),
-			"-s 'EXPORTED_RUNTIME_METHODS=[\"ccall\", \"writeArrayToMemory\"]'"
+			"-s 'EXPORTED_RUNTIME_METHODS=[\"ccall\", \"writeArrayToMemory\"]'",
+			"-s 'EXPORTED_FUNCTIONS=[\"_main\", \"_malloc\"]'"
 		}
 		
 		filter { "kind:*App" }
@@ -150,13 +157,8 @@ workspace "REDRIVER2"
 		cppdialect "C++11"
 		
 	filter {"system:Linux", "platforms:x86"}
-		buildoptions {
-			"-m32"
-		}
-		
-		linkoptions {
-			"-m32"
-		}
+		buildoptions { "-m32" }
+		linkoptions { "-m32" }
 
 	filter "system:Windows"
 		disablewarnings { "4996", "4554", "4244", "4101", "4838", "4309" }
@@ -177,8 +179,9 @@ workspace "REDRIVER2"
         defines {
             "NDEBUG",
         }
+        symbols "On"
         
-if os.target() == "windows" or os.target() == "emscripten" then
+if os.target() == "windows" then
 	include "premake_libjpeg.lua"
 end
 

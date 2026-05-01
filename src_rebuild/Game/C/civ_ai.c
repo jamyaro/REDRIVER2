@@ -44,7 +44,7 @@ struct
 } civPingTest;
 #endif // DEBUG
 
-char modelRandomList[] = { 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 0, 1, 0, 4 };
+char modelRandomList[16] = { 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 0, 1, 0, 4 };
 u_char reservedSlots[MAX_CARS] = { 0 };
 
 int distFurthestCivCarSq = 0;
@@ -1595,7 +1595,7 @@ int PingOutAllSpecialCivCars(void)
 
 	do
 	{
-		if (lcp->controlType == CONTROL_TYPE_CIV_AI && MissionHeader->residentModels[lcp->ap.model] > 4)
+		if (lcp->controlType == CONTROL_TYPE_CIV_AI && residentCarModels[lcp->ap.model] > 4)
 			PingOutCar(lcp);
 
 		lcp++;
@@ -1786,22 +1786,19 @@ int CreateStationaryCivCar(int direction, int orientX, int orientZ, LONGVECTOR4*
 	unsigned char* slot;
 	CAR_DATA* newCar;
 	CAR_DATA* carCnt;
-	int model;
+	int model, i;
 	EXTRA_CIV_DATA civDat;
 	LONGQUATERNION tmpQ;
 
 	model = -1;
-	
-	if (MissionHeader->residentModels[0] == externalModel)
-		model = 0;
-	else if (MissionHeader->residentModels[1] == externalModel)
-		model = 1;
-	else if (MissionHeader->residentModels[2] == externalModel)
-		model = 2;
-	else if (MissionHeader->residentModels[3] == externalModel)
-		model = 3;
-	else if (MissionHeader->residentModels[4] == externalModel)
-		model = 4;
+	for(i = 0; i < MAX_CAR_RESIDENT_MODELS; ++i)
+	{
+		if (residentCarModels[i] == externalModel)
+		{
+			model = i;
+			break;
+		}
+	}
 
 	if (model != -1)
 	{
@@ -2172,18 +2169,27 @@ int PingInCivCar(int minPingInDist)
 	}
 
 	// check if special car is loaded and add it to random list
-	if (specModelValid == 0 || allowSpecSpooling == 0 || MissionHeader->residentModels[4] == 12)
+	if ((specModelValid == 0 || allowSpecSpooling == 0 || residentCarModels[MAX_CAR_RESIDENT_MODELS - 1] == 12) && residentCarModels[MAX_CAR_RESIDENT_MODELS - 1] != 13)
 	{
+#if MAX_CAR_RESIDENT_MODELS == 6
+		modelRandomList[15] = 4;
+#else
 		modelRandomList[15] = 0;
+#endif
 		modelRandomList[14] = 1;
 	}
 	else
 	{
 		modelRandomList[15] = 4;
+
+#if MAX_CAR_RESIDENT_MODELS == 6
+		modelRandomList[14] = 4;
+#else
 		modelRandomList[14] = 1;
+#endif
 
 		if ((Random2(0) & 0x100) != 0)
-			modelRandomList[14] = 4;
+			modelRandomList[14] = MAX_CAR_RESIDENT_MODELS-1;
 	}
 
 	// another change for Caine's compound
@@ -2211,15 +2217,23 @@ int PingInCivCar(int minPingInDist)
 	}
 	else
 	{
-		model = modelRandomList[Random2(0) & 0xf];
+		model = modelRandomList[Random2(0) & 15];
 	}
 
 	// force spawn limo nearby in Caine's Cash
 	if (minPingInDist == 666)
-		model = 4;
+		model = MAX_CAR_RESIDENT_MODELS - 1;
+
+#if MAX_CAR_RESIDENT_MODELS == 6
+	// [A] fix crashes on missing models
+	if(!gCarCleanModelPtr[model])
+	{
+		return 0;
+	}
+#endif
 
 	// select car color palette
-	if (MissionHeader->residentModels[model] == 0 || MissionHeader->residentModels[model] > 4)
+	if (residentCarModels[model] == 0 || residentCarModels[model] > 4)
 	{
 		civDat.palette = 0;
 	}
@@ -2886,12 +2900,7 @@ void SetUpCivCollFlags(void)
 						hornchanflag[i] = GetFreeChannel();
 						SpuSetVoiceAR(hornchanflag[i], 27);
 
-						if (cp0->ap.model == 4)
-							sample = ResidentModelsBodge();
-						else if (cp0->ap.model < 3)
-							sample = cp0->ap.model;
-						else
-							sample = cp0->ap.model - 1;
+						sample = GetCarBankSample(cp0->ap.model);
 
 						// [A] use tracking sound
 						Start3DTrackingSound(hornchanflag[i], SOUND_BANK_CARS, sample * 3 + 2, 
@@ -3298,7 +3307,7 @@ void CreateRoadblock(void)
 	noMoreCars = 0;
 	distAlongSegment = -5;
 	lbody = car_cosmetics[3].colBox.vz;
-	externalCopModel = MissionHeader->residentModels[3];
+	externalCopModel = residentCarModels[3];
 
 	// [A] use player instead of car
 	dir = player[0].dir;

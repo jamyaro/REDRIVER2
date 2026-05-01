@@ -895,12 +895,20 @@ int CarBuildingCollision(CAR_DATA *cp, BUILDING_BOX *building, CELL_OBJECT *cop,
 				{
 					if (model->flags2 & MODEL_FLAG_TREE)
 					{
+						int rnd;
 						VECTOR LeafPosition;
 						LeafPosition.vx = collisionResult.hit.vx;
-						LeafPosition.vy = -((rand() & 0xfe) + 600) - collisionResult.hit.vy;
+						LeafPosition.vy = -((rand() & 254) + 600) - collisionResult.hit.vy;
 						LeafPosition.vz = collisionResult.hit.vz;
 
 						AddLeaf(&LeafPosition, 3, 1);
+
+						rnd = rand();
+						if ((rnd & 1) == 0)
+						{
+							LeafPosition.vy -= 1100;
+							CreateBirds(&LeafPosition, (rnd >> 8) & 7);
+						}
 					}
 					else 
 					{

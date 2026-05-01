@@ -17,8 +17,6 @@ project "PsyCross"
         "PsyCross/**.CPP",
     }
 
-    defines {  }
-
     includedirs { 
         SDL2_DIR.."/include",
         OPENAL_DIR.."/include",

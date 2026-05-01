@@ -58,18 +58,43 @@ int CleanSpooledModelSlots()
 void ProcessModel(int modelIdx)
 {
 	MODEL* model;
+	int lit;
 
 	model = modelpointers[modelIdx];
 	model->tri_verts = 0; // [A] this is used as additional flags for animated models and triangle processing
+	lit = 0;
 
 	if (gTimeOfDay == TIME_NIGHT)
 	{
-		if (model->shape_flags & SHAPE_FLAG_SPRITE)
+		if (GameLevel == 0)
 		{
-			if (modelIdx != 1223 && (!(model->flags2 & MODEL_FLAG_TREE) || modelIdx == 945 || modelIdx == 497))
-				litSprites[modelIdx >> 5] |= 1 << (modelIdx & 31);
+			// chicago
+		}
+		else if (GameLevel == 1)
+		{
+			// havana
+			if (model->shape_flags & SHAPE_FLAG_SPRITE)
+				lit = modelIdx != 1223 && !(model->flags2 & MODEL_FLAG_TREE);
+		}
+		else if (GameLevel == 2)
+		{
+			// vegas
+			if (model->shape_flags & SHAPE_FLAG_SPRITE)
+			{
+				if (gMultiplayerLevels)
+					lit = modelIdx == 263 || modelIdx == 275;
+				else
+					lit = modelIdx == 945 || modelIdx == 497;
+			}
+		}
+		else if (GameLevel == 3)
+		{
+			// rio
 		}
 	}
+
+	if(lit)
+		litSprites[modelIdx >> 5] |= 1 << (modelIdx & 31);
 }
 
 // [D] [T]
@@ -251,23 +276,23 @@ int ProcessCarModelLump(char *lump_ptr, int lump_size)
 
 	startBuildNewCars(0);
 
-	for (i = 0; i < MAX_CAR_MODELS; i++)
+	for (i = 0; i < MAX_CAR_RESIDENT_MODELS; i++)
 	{
 		gCarCleanModelPtr[i] = NULL;
 		gCarDamModelPtr[i] = NULL;
 		gCarLowModelPtr[i] = NULL;
 
-		if (i == MAX_CAR_MODELS-1)
+		if (i == MAX_CAR_RESIDENT_MODELS-1)
 		{
 			startBuildNewCars(1);
 			specmallocptr = (char*)mallocptr;
 		}
 
-		model_number = MissionHeader->residentModels[i];
+		model_number = residentCarModels[i];
 
 		if (model_number == 13)
 		{
-			model_number = 10 - (MissionHeader->residentModels[0] + MissionHeader->residentModels[1] + MissionHeader->residentModels[2]);
+			model_number = 10 - (residentCarModels[0] + residentCarModels[1] + residentCarModels[2]);
 
 			if (model_number < 1)
 				model_number = 1;

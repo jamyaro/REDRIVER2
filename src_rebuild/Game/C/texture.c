@@ -33,17 +33,57 @@ SXYPAIR tpagepos[20] =
 };
 
 char specTpages[4][12] = {
-	{ 54, 55, 66, 67, 56, 57, 68, 69, 61, 64, 61, 64 },
-	{ 38, 39, 38, 39, 42, 43, 44, 45, 48, 49, 48, 49 },
-	{ 18, 19, 65, 66, 67, 68, 11, 12, 63, 64, 63, 64 },
-	{ 66, 67, 77, 78, 73, 74, 75, 76, 69, 70, 71, 72 }
+	{
+		54, 55, 
+		66, 67, 
+		56, 57,
+		68, 69,
+		61, 64, 
+		61, 64 
+	},
+	{ 
+		38, 39, 
+		38, 39, 
+		42, 43, 
+		44, 45,
+		48, 49, 
+		48, 49 
+	},
+	{ 
+		18, 19, 
+		65, 66, 
+		67, 68, 
+		11, 12, 
+		63, 64, 
+		63, 64
+	},
+	{ 
+		66, 67, 
+		77, 78, 
+		73, 74, 
+		75, 76, 
+		69, 70, 
+		71, 72 
+	}
 };
 
 char carTpages[4][8] = {
-	{ 01, 65, 62, 50, 63, 58, 54, 55 },
-	{ 10, 35, 20, 37, 51, 36, 38, 39 },
-	{ 41, 54, 62, 17, 32, 59, 18, 00 },
-	{ 55, 57, 68, 58, 60, 59, 66, 67 }
+	{ 
+		01, 58, 65, 62, 50, 63,
+		54, 55
+	},
+	{ 
+		10, 36, 35, 20, 37, 51,
+		38, 39
+	},
+	{
+		41, 59, 54, 62, 17, 32,
+		18, 19 
+	},
+	{ 
+		55, 59, 57, 68, 58, 60,
+		66, 67
+	}
 };
 
 char *palette_lump;
@@ -493,7 +533,6 @@ void LoadPermanentTPages(int *sector)
 		int tp = permlist[i].x;
 
 		update_slotinfo(tp, slotsused, &tpage);
-
 		LoadTPageAndCluts(&tpage, &clutpos, tp, tpagebuffer);
 		slotsused++;
 
@@ -506,7 +545,7 @@ void LoadPermanentTPages(int *sector)
 	slot_clutpos[slotsused].vy = clutpos.y;
 
 	// init special slot texture
-	specmodel = (MissionHeader->residentModels[4] - 8) * 2;
+	specmodel = (residentCarModels[MAX_CAR_RESIDENT_MODELS - 1] - 8) * 2;
 	specialSlot = (short)slotsused;
 
 	// get special slot tpage
@@ -554,9 +593,9 @@ void LoadPermanentTPages(int *sector)
 			{
 				update_slotinfo(tp, slotsused, &tpage);
 				LoadTPageAndCluts(&tpage, &clutpos, tp, tpagebuffer);
+				slotsused++;
 
 				clutsloaded += npalettes;
-				slotsused++;
 			}
 
 			tpagebuffer += (speclist[i].y + 2047) & -CDSECTOR_SIZE;
@@ -599,7 +638,7 @@ void ReloadIcons(void)
 }
 
 // [D] [T]
-void GetTextureDetails(char *name, TEXTURE_DETAILS *info)
+void GetTextureDetails(char *name, TEXTURE_DETAILS *info, int defaultToSea)
 {
 	int i, j;
 	int texamt;
@@ -632,7 +671,12 @@ void GetTextureDetails(char *name, TEXTURE_DETAILS *info)
 		}
 	}
 
-	GetTextureDetails("SEA", info);	// weird but ok, ok...
+	info->tpageid = 0;
+	info->clutid = 0;
+	info->texture_number = 0;
+	info->texture_page = 0;
+	if (defaultToSea)
+		GetTextureDetails("SEA", info);	// weird but ok, ok...
 }
 
 
