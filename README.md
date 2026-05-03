@@ -1,5 +1,5 @@
 # REDRIVER2 (Reverse-Engineered Driver 2)
-[![Build status](https://ci.appveyor.com/api/projects/status/9abepvls6jexapqy/branch/master?svg=true)](https://ci.appveyor.com/project/SoapyMan/redriver2/branch/master)
+[![Build status (Master)](https://ci.appveyor.com/api/projects/status/p3smpt14elwlpcad/branch/master?svg=true)](https://ci.appveyor.com/project/SoapyMan/redriver2/branch/master)
 
 Windows
 
