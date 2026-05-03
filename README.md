@@ -1,19 +1,17 @@
 # REDRIVER2 (Reverse-Engineered Driver 2)
+[![Build status](https://ci.appveyor.com/api/projects/status/9abepvls6jexapqy/branch/master?svg=true)](https://ci.appveyor.com/project/SoapyMan/redriver2/branch/master)
 
-Game running on Windows:
+Windows
 
 ![](https://i.ibb.co/2q1pp06/red2.png)
 
-Game running in Firefox Web Browser:
+Web Browser
 
 ![](https://i.ibb.co/JxfC5xX/aaa.png)
 
-Game running on Playstation (emulated)
+Playstation
 
 ![](https://i.ibb.co/ydLsK9z/aaa.png)
-
-Build status (Windows and Linux):
-[![Build status](https://ci.appveyor.com/api/projects/status/9abepvls6jexapqy/branch/master?svg=true)](https://ci.appveyor.com/project/SoapyMan/redriver2-10jm8/branch/master)
 
 ### Information
 - This is an original game - it was carefully and completely disassembled and translated from MIPS back to C (except Memory Card menu) - ***no emulation involved***
@@ -37,9 +35,6 @@ See [Wiki/Installation Instructions](https://github.com/OpenDriver2/REDRIVER2/wi
 
 ### How can I contribute?
 See [Contributing to project](https://github.com/OpenDriver2/REDRIVER2/wiki/Contributing-to-project) page
-
-### What's next
-- ***OpenDriver2*** project - complete rewrite with lots of new features such as *new renderer and sound engine, Lua scripting, Driver 1 content support*
 
 ### Credits
 - **SoapyMan** - lead reverse engineer and programmer
