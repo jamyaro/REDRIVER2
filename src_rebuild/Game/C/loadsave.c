@@ -88,6 +88,10 @@ void ShowSavingWaitMessage(char *message, int height)
 #ifndef PSX
 void GetGameProfilePath(char* str)
 {
+#ifdef __SWITCH__
+	strcpy(str, "profile");
+	_mkdir(str);
+#else
 	char* homepath;
 
 	homepath = getenv(HOME_ENV); // "USERPROFILE"
@@ -104,6 +108,7 @@ void GetGameProfilePath(char* str)
 	{
 		str[0] = 0;
 	}
+#endif
 }
 #endif // PSX
 

@@ -40,7 +40,8 @@ extern volatile char* _primTab2;			// 0x119400
 extern volatile char* _sbank_buffer;		// 0x180000
 extern volatile char* _replay_buffer;		// 0x1FABBC
 
-extern char gDataFolder[32];
+extern char gDataFolder[256];
+extern char gStartupFailureMessage[512];
 
 #define PSX_MALLOC_SIZE 870332
 

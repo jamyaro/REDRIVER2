@@ -1779,6 +1779,8 @@ int redriver2_main(int argc, char** argv)
 		NULL
 	};
 
+	gStartupFailureMessage[0] = '\0';
+
 	//_stacksize = 0x4000;
 	//_ramsize = 0x200000;
 
@@ -1862,6 +1864,14 @@ int redriver2_main(int argc, char** argv)
 	if (!FileExists("DATA\\FEFONT.BNK") || !FileExists("GFX\\FONT2.FNT"))
 	{
 		char str[320];
+		snprintf(gStartupFailureMessage, sizeof(gStartupFailureMessage),
+			"Required game assets were not found.\n\n"
+			"Extract game data from your Driver 2 CDs to:\n"
+			"%s\n\n"
+			"Required files include:\n"
+			"DATA/FEFONT.BNK\n"
+			"GFX/FONT2.FNT",
+			gDataFolder);
 		sprintf(str, "Cannot initialize REDRIVER2\n\nGame files not found by folder '%s'\n", gDataFolder);
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "ERROR!", str, NULL);
 		return -1;
@@ -1870,6 +1880,11 @@ int redriver2_main(int argc, char** argv)
 	// init language
 	if (!InitStringMng())
 	{
+		snprintf(gStartupFailureMessage, sizeof(gStartupFailureMessage),
+			"Language files could not be loaded from:\n%sLANG/\n\n"
+			"Download the release artifacts from Github and extract them to:\n"
+			"%s",
+			gDataFolder, gDataFolder);
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "ERROR!", "Unable to load language files!\n\nSee console for details", NULL);
 		return -1;
 	}

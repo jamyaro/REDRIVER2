@@ -29,6 +29,129 @@
 
 #include "PsyX/PsyX_globals.h"
 
+#ifdef __SWITCH__
+#ifdef inval
+#undef inval
+#endif
+
+extern "C" {
+#include <switch/arm/thread_context.h>
+#include <switch/result.h>
+#include <switch/services/nifm.h>
+#include <switch/services/ssl.h>
+#include <switch/runtime/devices/console.h>
+#include <switch/runtime/devices/socket.h>
+#include <switch/runtime/nxlink.h>
+}
+
+#include <stdio.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+static int g_nxlinkSock = -1;
+static bool g_socketInitialised = false;
+
+static void EnsureSwitchPathExists(const char* path)
+{
+	char partialPath[256];
+	size_t length = strlen(path);
+
+	if (length >= sizeof(partialPath))
+		return;
+
+	for (size_t index = 0; index < length; ++index)
+	{
+		partialPath[index] = path[index];
+		partialPath[index + 1] = '\0';
+
+		if (path[index] == '/' && index > 0 && path[index - 1] != ':')
+			mkdir(partialPath, 0777);
+	}
+
+	mkdir(path, 0777);
+}
+
+static void InitialiseNxlinkStdio()
+{
+	Result rc = socketInitializeDefault();
+	if (R_FAILED(rc))
+		return;
+
+	g_socketInitialised = true;
+	g_nxlinkSock = nxlinkStdio();
+}
+
+static void ShutdownNxlinkStdio()
+{
+	if (g_nxlinkSock >= 0)
+	{
+		close(g_nxlinkSock);
+		g_nxlinkSock = -1;
+	}
+
+	if (g_socketInitialised)
+	{
+		socketExit();
+		g_socketInitialised = false;
+	}
+}
+
+static void ShowSwitchStartupErrorScreen(const char* title, const char* message)
+{
+	consoleInit(NULL);
+	consoleClear();
+
+	printf("%s\n\n", title);
+	printf("%s\n\n", message);
+	printf("The app will close in 30 seconds.\n");
+
+	consoleUpdate(NULL);
+	sleep(30);
+	consoleExit(NULL);
+}
+
+extern "C" void userAppInit(void)
+{
+	EnsureSwitchPathExists("sdmc:/switch/redriver2");
+	chdir("sdmc:/switch/redriver2");
+	InitialiseNxlinkStdio();
+}
+
+extern "C" void userAppExit(void)
+{
+	ShutdownNxlinkStdio();
+}
+
+alignas(16) __attribute__((used)) u8 __nx_exception_stack[0x1000];
+u64 __nx_exception_stack_size = sizeof(__nx_exception_stack);
+
+extern "C" __attribute__((used)) void __libnx_exception_handler(ThreadExceptionDump* ctx)
+{
+	FILE* dumpFile = fopen("sdmc:/switch/redriver2/exception_dump.txt", "w");
+	if (!dumpFile)
+		dumpFile = fopen("sdmc:/redriver2_exception_dump.txt", "w");
+
+	if (!dumpFile)
+		return;
+
+	fprintf(dumpFile, "error_desc: 0x%x\n", ctx->error_desc);
+	for (int index = 0; index < 29; ++index)
+		fprintf(dumpFile, "[X%d]: 0x%lx\n", index, ctx->cpu_gprs[index].x);
+
+	fprintf(dumpFile, "fp: 0x%lx\n", ctx->fp.x);
+	fprintf(dumpFile, "lr: 0x%lx\n", ctx->lr.x);
+	fprintf(dumpFile, "sp: 0x%lx\n", ctx->sp.x);
+	fprintf(dumpFile, "pc: 0x%lx\n", ctx->pc.x);
+	fprintf(dumpFile, "pstate: 0x%x\n", ctx->pstate);
+	fprintf(dumpFile, "afsr0: 0x%x\n", ctx->afsr0);
+	fprintf(dumpFile, "afsr1: 0x%x\n", ctx->afsr1);
+	fprintf(dumpFile, "esr: 0x%x\n", ctx->esr);
+	fprintf(dumpFile, "far: 0x%lx\n", ctx->far.x);
+
+	fclose(dumpFile);
+}
+#endif
+
 
 int(*GPU_printf)(const char *fmt, ...);
 
@@ -667,11 +790,18 @@ int main(int argc, char** argv)
 	// start with menu mapping
 	SwitchMappings(1);
 
-	redriver2_main(argc, argv);
+	int mainResult = redriver2_main(argc, argv);
 
 	DeinitStringMng();
 
 	PsyX_Shutdown();
+
+#ifdef __SWITCH__
+	if (mainResult != 0 && gStartupFailureMessage[0] != '\0')
+	{
+		ShowSwitchStartupErrorScreen("REDRIVER2 startup error", gStartupFailureMessage);
+	}
+#endif
 
 	return 0;
 }
