@@ -18,10 +18,14 @@ project "PsyCross"
     }
 
     includedirs { 
-        SDL2_DIR.."/include",
-        OPENAL_DIR.."/include",
 		"PsyCross/include"
     }
+
+	filter {"system:Windows or linux or android or platforms:emscripten"}
+		includedirs {
+			SDL2_DIR.."/include",
+			OPENAL_DIR.."/include",
+		}
 
     filter "system:Windows"
 	    defines { "_WINDOWS" }
@@ -52,6 +56,17 @@ project "PsyCross"
             "GL",
             "openal",
             "SDL2",
+        }
+
+    filter "system:switch"
+        targetdir "bin/%{cfg.buildcfg}/switch"
+        objdir "obj/%{cfg.buildcfg}/switch/%{prj.name}"
+        removefiles { "PsyCross/src/render/glad.c" }
+
+        includedirs {
+            SWITCH_LIBNX_DIR.."/include",
+            SWITCH_PORTLIBS_DIR.."/include",
+            SWITCH_PORTLIBS_DIR.."/include/SDL2",
         }
 
     filter "configurations:Release"

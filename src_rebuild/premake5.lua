@@ -5,6 +5,7 @@ require "premake_modules/emscripten"
 require "premake_modules/vscode"
 
 IS_ANDROID = (_ACTION == "androidndk")
+IS_SWITCH = (os.target() == "switch")
 
 ------------------------------------------
 
@@ -15,12 +16,26 @@ newoption {
 
 table.insert(premake.option.get("os").allowed, { "emscripten", "Emscripten" })
 
+table.insert(premake.option.get("os").allowed, { "switch", "Nintendo Switch" })
+premake.api.addAllowed("system", { "switch" })
+
 ------------------------------------------
 
 -- you can redefine dependencies
 SDL2_DIR = os.getenv("SDL2_DIR") or "dependencies/SDL2"
 OPENAL_DIR = os.getenv("OPENAL_DIR") or "dependencies/openal-soft"
 JPEG_DIR = os.getenv("JPEG_DIR") or "dependencies/jpeg"
+
+DEVKITPRO_DIR = os.getenv("DEVKITPRO") or "/opt/devkitpro"
+SWITCH_LIBNX_DIR = DEVKITPRO_DIR .. "/libnx"
+SWITCH_PORTLIBS_DIR = DEVKITPRO_DIR .. "/portlibs/switch"
+SWITCH_ARCH_OPTIONS = {
+	"-march=armv8-a+crc+crypto",
+	"-mtune=cortex-a57",
+	"-mtp=soft",
+	"-fPIE",
+	"-ftls-model=local-exec",
+}
 
 WEBDEMO_DIR = os.getenv("WEBDEMO_DIR") or "../../web_demo@/"	-- FIXME: make it better
 RED2_DIR = os.getenv("RED2_DIR") or "../../data@/"
@@ -135,6 +150,20 @@ workspace "REDRIVER2"
 
 		filter "platforms:*-arm64"
 			architecture "arm64"
+	elseif IS_SWITCH then
+		system "switch"
+		platforms { "Switch" }
+
+		defines {
+			"__SWITCH__",
+		}
+
+		buildoptions(SWITCH_ARCH_OPTIONS)
+
+		linkoptions {
+			SWITCH_ARCH_OPTIONS,
+			"-specs=" .. SWITCH_LIBNX_DIR .. "/switch.specs",
+		}
 	else
 		platforms { "x86", "x64" }
 	end
@@ -154,6 +183,18 @@ workspace "REDRIVER2"
             "-fpermissive"
         }
 		
+		cppdialect "C++11"
+
+	filter "system:switch"
+		buildoptions {
+			"-Wno-narrowing",
+			"-Wno-write-strings",
+			"-Wno-format-security",
+			"-Wno-unused-result",
+			"-fsigned-char",
+			"-fpermissive",
+		}
+
 		cppdialect "C++11"
 		
 	filter {"system:Linux", "platforms:x86"}
@@ -228,6 +269,42 @@ project "REDRIVER2"
         --dependson { "PsyX" }
         links { "jpeg" }
 				
+		files {
+			"utils/**.h",
+			"utils/**.cpp",
+			"utils/**.c",
+			"redriver2_psxpc.cpp",
+		}
+
+	filter "system:switch"
+		targetdir "bin/%{cfg.buildcfg}/switch"
+		objdir "obj/%{cfg.buildcfg}/switch/%{prj.name}"
+		targetextension ".elf"
+
+		links {
+			"jpeg",
+			"SDL2",
+			"openal",
+			"EGL",
+			"GLESv2",
+			"glapi",
+			"drm_nouveau",
+			"m",
+			"nx",
+		}
+
+		includedirs {
+			JPEG_DIR.."/",
+			SWITCH_LIBNX_DIR.."/include",
+			SWITCH_PORTLIBS_DIR.."/include",
+			SWITCH_PORTLIBS_DIR.."/include/SDL2",
+		}
+
+		libdirs {
+			SWITCH_LIBNX_DIR.."/lib",
+			SWITCH_PORTLIBS_DIR.."/lib",
+		}
+
 		files {
 			"utils/**.h",
 			"utils/**.cpp",
