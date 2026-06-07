@@ -8,6 +8,21 @@ OUTPUT_ELF="$BUILD_DIR/REDRIVER2.elf"
 OUTPUT_NRO="$BUILD_DIR/REDRIVER2.nro"
 NACP_FILE="$BUILD_DIR/REDRIVER2.nacp"
 ICON_FILE="$ROOT_DIR/.flatpak/icon.png"
+NACP_VERSION_MAX_BYTES=8
+APP_VERSION="${APP_VERSION-dev}"
+
+app_version_bytes="$(printf "%s" "$APP_VERSION" | wc -c)"
+app_version_bytes="${app_version_bytes//[[:space:]]/}"
+
+if [[ -z "$APP_VERSION" ]]; then
+    echo "error: APP_VERSION must not be empty" >&2
+    exit 1
+fi
+
+if (( app_version_bytes > NACP_VERSION_MAX_BYTES )); then
+    echo "error: APP_VERSION must be $NACP_VERSION_MAX_BYTES bytes or fewer for nacptool: $APP_VERSION" >&2
+    exit 1
+fi
 
 if [[ ! -f "$PSYCROSS_MAIN" ]]; then
     echo "error: PsyCross submodule is missing. Run 'git submodule update --init --recursive'." >&2
@@ -51,7 +66,7 @@ if ! command -v elf2nro >/dev/null 2>&1; then
 fi
 
 nacptool \
-    --create "REDRIVER2" "OpenDriver2" "1.0.0" \
+    --create "REDRIVER2" "OpenDriver2" "$APP_VERSION" \
     "$NACP_FILE"
 
 elf2nro "$OUTPUT_ELF" "$OUTPUT_NRO" --nacp="$NACP_FILE" --icon="$ICON_FILE"

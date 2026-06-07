@@ -2,6 +2,7 @@
 set -euo pipefail
 
 IMAGE_NAME="${IMAGE_NAME:-redriver2-switch-builder:latest}"
+APP_VERSION="${APP_VERSION-dev}"
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 
 docker build \
@@ -10,6 +11,7 @@ docker build \
     "$ROOT_DIR"
 
 docker run --rm \
+    -e APP_VERSION="$APP_VERSION" \
     -e DEVKITPRO=/opt/devkitpro \
     -e DEVKITA64=/opt/devkitpro/devkitA64 \
     -v "$ROOT_DIR:/src:Z" \

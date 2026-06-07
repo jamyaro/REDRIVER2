@@ -1,45 +1,35 @@
-# REDRIVER2 (Reverse-Engineered Driver 2)
-[![Build status (Master)](https://ci.appveyor.com/api/projects/status/p3smpt14elwlpcad/branch/master?svg=true)](https://ci.appveyor.com/project/SoapyMan/redriver2/branch/master)
+# REDRIVER2 (Reverse-Engineered Driver 2) Switch
 
-Windows
+A port of [REDRIVER2](https://github.com/OpenDriver2/REDRIVER2) to Switch homebrew.
 
-![](https://i.ibb.co/2q1pp06/red2.png)
+## Installation
 
-Web Browser
+### Converting assets
 
-![](https://i.ibb.co/JxfC5xX/aaa.png)
+First, set up a working install on PC using your copy of Driver 2:
 
-Playstation
+1. Follow the [installation instructions for the PC version](https://github.com/OpenDriver2/REDRIVER2/wiki/Installation-instructions).
+1. Test that FMVs play back and that levels load.
 
-![](https://i.ibb.co/ydLsK9z/aaa.png)
+You should end up with a DRIVER2 folder that has:
+* New folders, like `MAPS`
+* `avi` files in the FMV folders
 
-### Information
-- This is an original game - it was carefully and completely disassembled and translated from MIPS back to C (except Memory Card menu) - ***no emulation involved***
-- Game has been *significantly improved over the original Playstation version*, original bugs were fixed and completed some unfinished gameplay aspects
-- It now runs on Windows, Linux and soon to be on the other platforms (including backport to Playstation) and utilizes [Psy-X (Psy-Cross) (formely extended TOMB5 emulator)](https://github.com/OpenDriver2/REDRIVER2/tree/master/src_rebuild/PsyX) as a layer for porting from Playstation
-- Basic modding support - with textures and models replacement provided with [OpenDriver2Tools](https://github.com/OpenDriver2/OpenDriver2Tools)
+### Installing on Switch
+1. Download the latest release
+1. Extract to your SD card
+1. Copy the DRIVER2 folder from your PC install folder to your SD card at `/switch/redriver2`. **Skip overwriting** existing assets when prompted.
 
-### How is it done?
-- All information (variables, types and function names) have been obtained from debugging symbols (.SYM), driver_psx_level and DLE
-- Ghidra project (based on Italian SYM) to deal with overlays, simple code complex branching - semi-auto decompilation
-- IDB based on Spanish SYM when dealing with things Ghidra can't handle properly - manual decompilation (mostly GTE code)
+## Gameplay Notes
+* Controls use dpad by default. Press - and + to switch to analog mode
+* Rebind controls, change resolution etc. by editing config.ini.
 
-History:
-- Feb 19, 2019 - created skeleton, one year long preparations
-- Mar 28, 2020 - started work on reimplementing the game, game intro running
-- Sep 19, 2020 - reimplementing game complete - game is fully playable
-- Jan 15, 2021 - refactoring complete
-
-### How to use
-See [Wiki/Installation Instructions](https://github.com/OpenDriver2/REDRIVER2/wiki/Installation-instructions)
-
-### How can I contribute?
-See [Contributing to project](https://github.com/OpenDriver2/REDRIVER2/wiki/Contributing-to-project) page
-
-### Credits
+## Credits
 - **SoapyMan** - lead reverse engineer and programmer
 - **Fireboyd78** - code refactoring and improvements
 - **Krishty, someone972** - early formats decoding
 - **Gh0stBlade** - HLE Emulator code used as a base for Psy-Cross [(link)](https://github.com/TOMB5/TOMB5/tree/master/EMULATOR)
 - **Ben Lincoln** - [This Dust Remembers What It Once Was](https://www.beneaththewaves.net/Software/This_Dust_Remembers_What_It_Once_Was.html) (*TDR*)
 - **Stohrendorf** - [Symdump](https://github.com/stohrendorf/symdump) utility
+
+AI was used in the development of this port.

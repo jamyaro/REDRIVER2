@@ -1,0 +1,112 @@
+name: Build Switch NRO
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+    tags:
+      - "*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build Switch NRO
+    runs-on: ubuntu-latest
+
+    steps:
+      # actions/checkout v6.0.2
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          submodules: recursive
+
+      - name: Set NACP version
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          nacp_version_max_bytes=8
+
+          if [[ "${GITHUB_REF_TYPE:-}" == "tag" ]]; then
+            app_version="${GITHUB_REF_NAME#v}"
+            app_version_bytes="$(printf "%s" "$app_version" | wc -c)"
+            app_version_bytes="${app_version_bytes//[[:space:]]/}"
+
+            if [[ -z "$app_version" ]]; then
+              echo "error: tag ${GITHUB_REF_NAME} produces an empty NACP version" >&2
+              exit 1
+            fi
+
+            if (( app_version_bytes > nacp_version_max_bytes )); then
+              echo "error: tag ${GITHUB_REF_NAME} produces NACP version '${app_version}', which is ${app_version_bytes} bytes; max is ${nacp_version_max_bytes}" >&2
+              exit 1
+            fi
+          else
+            app_version="${GITHUB_SHA:0:nacp_version_max_bytes}"
+          fi
+
+          printf "APP_VERSION=%s\n" "$app_version" >> "$GITHUB_ENV"
+          printf "Using NACP APP_VERSION=%s\n" "$app_version"
+
+      - name: Build NRO
+        run: ./switch/docker-build.sh
+
+      - name: Package SD card layout
+        id: package
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          nro_path="src_rebuild/bin/Release/switch/REDRIVER2.nro"
+          config_path="data/config.ini"
+          data_path="data/DRIVER2"
+          package_root="redriver2-switch"
+          install_root="$package_root/switch/redriver2"
+
+          test -f "$nro_path"
+          test -f "$config_path"
+          test -d "$data_path"
+
+          rm -rf "$package_root"
+          mkdir -p "$install_root"
+
+          cp "$nro_path" "$install_root/REDRIVER2.nro"
+          cp "$config_path" "$install_root/config.ini"
+          cp -R "$data_path" "$install_root/DRIVER2"
+
+          if [[ "${GITHUB_REF_TYPE:-}" == "tag" ]]; then
+            zip_name="REDRIVER2-switch-${GITHUB_REF_NAME}.zip"
+          else
+            zip_name="REDRIVER2-switch-${GITHUB_SHA:0:8}.zip"
+          fi
+
+          (
+            cd "$package_root"
+            zip -r "../$zip_name" switch
+          )
+
+          unzip -l "$zip_name"
+          unzip -Z1 "$zip_name" | grep -Fx "switch/redriver2/REDRIVER2.nro"
+          unzip -Z1 "$zip_name" | grep -Fx "switch/redriver2/config.ini"
+          unzip -Z1 "$zip_name" | grep -Fx "switch/redriver2/DRIVER2/"
+
+          echo "zip_name=$zip_name" >> "$GITHUB_OUTPUT"
+
+      # actions/upload-artifact v7.0.1
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: ${{ steps.package.outputs.zip_name }}
+          path: ${{ steps.package.outputs.zip_name }}
+          if-no-files-found: error
+          archive: false
+
+      # softprops/action-gh-release v3.0.0
+      - name: Upload release asset
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda
+        with:
+          files: ${{ steps.package.outputs.zip_name }}
