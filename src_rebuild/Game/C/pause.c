@@ -16,6 +16,18 @@
 #include "loadsave.h"
 #include "cutrecorder.h"
 
+#ifdef __SWITCH__
+#ifdef inval
+#undef inval
+#endif
+extern "C" {
+#include <switch/applets/swkbd.h>
+#include <switch/result.h>
+}
+#elif !defined(PSX)
+#include <SDL_keyboard.h>
+#endif
+
 #define REPLAY_NAME_LEN		16
 #define SCORE_NAME_LEN		5
 
@@ -489,6 +501,38 @@ MENU_HEADER InvalidMultiPadHeader =
 u_char gCurrentTextChar = 0;
 typedef void(*OnEntryComplete)(void* data, char* text);
 
+static int IsValidTextEntryChar(char chr)
+{
+	for (int i = 0; i < 66; i++)
+	{
+		if (validchars[i] == chr)
+			return 1;
+	}
+
+	return 0;
+}
+
+static void CopySanitizedTextEntry(char* destination, const char* source, int maxLength)
+{
+	int pos = 0;
+
+	if (!destination || !source || maxLength <= 0)
+		return;
+
+	while (*source && pos < maxLength)
+	{
+		if (IsValidTextEntryChar(*source))
+		{
+			destination[pos] = *source;
+			pos++;
+		}
+
+		source++;
+	}
+
+	destination[pos] = 0;
+}
+
 void ScoreNameInputHandler(const char* input)
 {
 	if (!input)
@@ -502,6 +546,44 @@ void ScoreNameInputHandler(const char* input)
 
 #define USE_PAD_INPUT defined(PSX)
 
+#ifdef __SWITCH__
+static char* WaitForSwitchTextEntry(char* textBufPtr, int maxLength)
+{
+	SwkbdConfig swkbd;
+	Result result;
+	char output[32];
+	char* username;
+
+	username = textBufPtr ? textBufPtr : (char*)_overlay_buffer;
+
+	if (maxLength >= (int)sizeof(output))
+		maxLength = sizeof(output) - 1;
+
+	output[0] = 0;
+
+	result = swkbdCreate(&swkbd, 0);
+	if (R_FAILED(result))
+		return NULL;
+
+	swkbdConfigMakePresetDefault(&swkbd);
+	swkbdConfigSetHeaderText(&swkbd, G_LTXT(GTXT_EnterName));
+	swkbdConfigSetInitialText(&swkbd, username);
+	swkbdConfigSetStringLenMax(&swkbd, maxLength);
+	swkbdConfigSetStringLenMin(&swkbd, 1);
+	swkbdConfigSetTextDrawType(&swkbd, SwkbdTextDrawType_Line);
+
+	result = swkbdShow(&swkbd, output, sizeof(output));
+	swkbdClose(&swkbd);
+
+	if (R_FAILED(result))
+		return NULL;
+
+	CopySanitizedTextEntry(username, output, maxLength);
+
+	return username[0] ? username : NULL;
+}
+#endif
+
 // [A] Enter the replay name to save
 char* WaitForTextEntry(char* textBufPtr, int maxLength)
 {
@@ -509,18 +591,25 @@ char* WaitForTextEntry(char* textBufPtr, int maxLength)
 	int so, co;
 	int delay, toggle;
 	char* username;
+	char* result;
 	unsigned short npad, dpad;
 
+#ifdef __SWITCH__
+	return WaitForSwitchTextEntry(textBufPtr, maxLength);
+#endif
+
 	username = textBufPtr ? textBufPtr : (char*)_overlay_buffer;
+	result = username;
 	delay = 0;
 	toggle = 0;
 	co = 1;
 	so = strlen(username);
 
-#if !USE_PAD_INPUT
+#if !USE_PAD_INPUT && !defined(__SWITCH__)
 	// PsyX input handler
 	g_cfg_gameOnTextInput = ScoreNameInputHandler;
 	gCurrentTextChar = 0;
+	SDL_StartTextInput();
 #endif
 
 	do {
@@ -535,7 +624,10 @@ char* WaitForTextEntry(char* textBufPtr, int maxLength)
 
 		// cancel
 		if (npad & 0x10)
-			return NULL;
+		{
+			result = NULL;
+			break;
+		}
 
 #if USE_PAD_INPUT
 		if (dpad & 0x20)
@@ -688,11 +780,12 @@ char* WaitForTextEntry(char* textBufPtr, int maxLength)
 #endif
 	} while (true);
 
-#if !USE_PAD_INPUT
+#if !USE_PAD_INPUT && !defined(__SWITCH__)
+	SDL_StopTextInput();
 	g_cfg_gameOnTextInput = NULL;
 #endif
 
-	return username;
+	return result;
 }
 
 void SkipCutscene(int direction)
@@ -1382,6 +1475,38 @@ void MusicVolume(int direction)
 	SetXMVolume(gMusicVolume);
 }
 
+static void ViewScoreTable(void)
+{
+	SCORE_ENTRY* table;
+	unsigned short npad;
+
+	table = NULL;
+	OnScoreTable(&table);
+
+	if (table == NULL)
+		return;
+
+	gScorePosition = -1;
+	CreateScoreNames(table, NULL, gScorePosition);
+	gEnteringScore = 1;
+
+	do {
+		if (!FilterFrameTime())
+			continue;
+
+		ReadControllers();
+		npad = Pads[0].dirnew;
+
+		DrawGame();
+
+#ifdef __EMSCRIPTEN__
+		emscripten_sleep(0);
+#endif
+	} while ((npad & (MPAD_CROSS | MPAD_TRIANGLE | MPAD_START)) == 0);
+
+	gEnteringScore = 0;
+}
+
 // [D] [T]
 void EnterScoreName(void)
 {
@@ -1405,7 +1530,8 @@ void EnterScoreName(void)
 	}
 	else
 	{
-		gScorePosition = -1;
+		ViewScoreTable();
+		return;
 	}
 
 	gEnteringScore = 1;
