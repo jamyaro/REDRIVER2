@@ -63,6 +63,8 @@
 #define trap(ode) {printError("EXCEPTION code: %x\n", ode);}
 #elif _MSC_VER >= 1400
 #define trap(ode) {printError("EXCEPTION code: %x\n", ode); __debugbreak();}
+#elif defined(__SWITCH__)
+#define trap(ode) {printError("EXCEPTION code: %x\n", ode); __builtin_trap();}
 #elif defined(__GNUC__)
 #define trap(ode) {__asm__("int3");}
 #else
